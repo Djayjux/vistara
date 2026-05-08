@@ -203,23 +203,20 @@
     </div>
 
     <div class="toast" id="toast"></div>
+<script>
+// ═══════════════════════════════════════════
+// CONFIGURATION
+// ═══════════════════════════════════════════
+var API_URL = 'https://script.google.com/macros/s/AKfycbxmbOEKhMFd5vMJn2X8VT4YzNQxrHweb2Udb1V8qyZ95N1vrDqRBxgmrAqtS503637K5g/exec';
+var ADMIN_KEY = sessionStorage.getItem('vistara_admin_key') || 'vistara-admin-2024-secure-key-change-this';
 
-    <script>
-        // ═══════════════════════════════════════════
-        // CONFIGURATION
-        // ═══════════════════════════════════════════
-        var API_URL = 'https://script.google.com/macros/s/AKfycbxmbOEKhMFd5vMJn2X8VT4YzNQxrHweb2Udb1V8qyZ95N1vrDqRBxgmrAqtS503637K5g/exec';
-        var ADMIN_KEY = sessionStorage.getItem('vistara_admin_key') || '';
+// AED Pricing
+var AED_PRICES = { 'Starter': 99, 'Growth': 275, 'Pro': 699, 'Enterprise': 1799 };
 
-        // AED Pricing
-        var AED_PRICES = {
-            'Starter': 99,
-            'Growth': 275,
-            'Pro': 699,
-            'Enterprise': 1799
-        };
-
-        async function api(action, payload) {
+// ═══════════════════════════════════════════
+// API CALL (No CORS issues)
+// ═══════════════════════════════════════════
+async function api(action, payload) {
     if (!ADMIN_KEY) {
         ADMIN_KEY = prompt('Enter admin API key:');
         if (!ADMIN_KEY) return { error: 'Admin key required' };
@@ -236,7 +233,6 @@
         var response = await fetch(API_URL, {
             method: 'POST',
             body: body
-            // NO Content-Type header — this is the key!
         });
 
         if (response.status === 403) {
@@ -251,122 +247,176 @@
         return { error: 'Network error: ' + e.message };
     }
 }
-        var xhr = new XMLHttpRequest();
-            xhr.open('POST', API_URL, true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.onload = function() {
-                if (xhr.status === 200) { callback(JSON.parse(xhr.responseText)); }
-                else if (xhr.status === 403) { ADMIN_KEY = ''; sessionStorage.removeItem('vistara_admin_key'); callback({ error: 'Invalid admin key' }); }
-                else { callback({ error: 'Server error: ' + xhr.status }); }
-            };
-            xhr.onerror = function() { callback({ error: 'Network error' }); };
-            xhr.send('data=' + encodeURIComponent(JSON.stringify({ action: action, payload: Object.assign({}, payload, { adminKey: ADMIN_KEY }) })));
-        }
 
-        function switchTab(tab, btn) {
-            document.querySelectorAll('.nav-link').forEach(function(n) { n.classList.remove('active'); });
-            document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
-            if (btn) btn.classList.add('active');
-            document.getElementById('page-' + tab).classList.add('active');
-            if (tab === 'all-licenses') loadAllLicenses();
-            if (tab === 'businesses') loadBusinesses();
-            if (tab === 'revenue') loadRevenue();
-        }
+// ═══════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════
+function switchTab(tab, btn) {
+    document.querySelectorAll('.nav-link').forEach(function(n) { n.classList.remove('active'); });
+    document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+    document.getElementById('page-' + tab).classList.add('active');
+    if (tab === 'all-licenses') loadAllLicenses();
+    if (tab === 'businesses') loadBusinesses();
+    if (tab === 'revenue') loadRevenue();
+}
 
-        function generateLicense() {
-            var name = document.getElementById('lic-name').value.trim();
-            if (!name || name.length < 2) return showToast('Please enter a valid business name', 'error');
-            var plan = document.getElementById('lic-plan').value;
-            var price = AED_PRICES[plan] || 0;
-            
-            api('adminGenerateLicense', {
-                businessName: name,
-                plan: plan,
-                expiryDays: parseInt(document.getElementById('lic-expiry').value)
-            }, function(result) {
-                if (result.success) {
-                    document.getElementById('license-key-text').textContent = result.licenseKey;
-                    document.getElementById('generated-license').classList.add('show');
-                    document.getElementById('lic-name').value = '';
-                    showToast('✅ License generated! ' + plan + ' Plan — AED ' + price + '/mo', 'success');
-                } else {
-                    showToast(result.error || 'Failed to generate', 'error');
-                }
-            });
-        }
+// ═══════════════════════════════════════════
+// LICENSE GENERATION
+// ═══════════════════════════════════════════
+async function generateLicense() {
+    var name = document.getElementById('lic-name').value.trim();
+    if (!name || name.length < 2) {
+        showToast('Please enter a valid business name', 'error');
+        return;
+    }
+    
+    var plan = document.getElementById('lic-plan').value;
+    var price = AED_PRICES[plan] || 0;
+    
+    var result = await api('adminGenerateLicense', {
+        businessName: name,
+        plan: plan,
+        expiryDays: parseInt(document.getElementById('lic-expiry').value)
+    });
+    
+    if (result.success) {
+        document.getElementById('license-key-text').textContent = result.licenseKey;
+        document.getElementById('generated-license').classList.add('show');
+        document.getElementById('lic-name').value = '';
+        showToast('License generated! ' + plan + ' Plan — AED ' + price + '/mo', 'success');
+    } else {
+        showToast(result.error || 'Failed to generate', 'error');
+    }
+}
 
-        function copyLicense() {
-            var key = document.getElementById('license-key-text').textContent;
-            navigator.clipboard?.writeText(key).then(function() { showToast('Copied!', 'success'); });
-        }
+function copyLicense() {
+    var key = document.getElementById('license-key-text').textContent;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(key).then(function() { showToast('Copied!', 'success'); });
+    } else {
+        var textarea = document.createElement('textarea');
+        textarea.value = key;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try { document.execCommand('copy'); showToast('Copied!', 'success'); } catch(e) { showToast('Copy manually: ' + key, ''); }
+        document.body.removeChild(textarea);
+    }
+}
 
-        function loadAllLicenses() {
-            api('adminGetBusinesses', {}, function(result) {
-                var container = document.getElementById('all-licenses-list');
-                if (!result.businesses?.length) { container.innerHTML = '<p style="padding:30px;text-align:center;">No licenses issued yet.</p>'; return; }
-                var html = '<div class="table-wrap"><table><thead><tr><th>Business</th><th>Plan</th><th>Price</th><th>License Key</th><th>Status</th></tr></thead><tbody>';
-                result.businesses.forEach(function(b) {
-                    var price = AED_PRICES[b.plan] || 0;
-                    html += '<tr><td style="font-weight:500;">' + esc(b.name) + '</td><td><span class="badge badge-blue">' + (b.plan || 'N/A') + '</span></td><td style="font-weight:600;color:var(--accent);">AED ' + price + '/mo</td><td style="font-family:monospace;font-size:10px;">' + (b.licenseKey ? b.licenseKey.substring(0,18) + '...' : 'N/A') + '</td><td>' + (b.status === 'active' ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-red">' + (b.status || 'Unknown') + '</span>') + '</td></tr>';
-                });
-                html += '</tbody></table></div>';
-                container.innerHTML = html;
-            });
-        }
+// ═══════════════════════════════════════════
+// LOAD DATA
+// ═══════════════════════════════════════════
+async function loadAllLicenses() {
+    document.getElementById('all-licenses-list').innerHTML = '<p style="padding:30px;text-align:center;">Loading...</p>';
+    var result = await api('adminGetBusinesses');
+    var container = document.getElementById('all-licenses-list');
+    
+    if (!result.businesses || result.businesses.length === 0) {
+        container.innerHTML = '<p style="padding:30px;text-align:center;">No licenses issued yet.</p>';
+        return;
+    }
+    
+    var html = '<div class="table-wrap"><table><thead><tr><th>Business</th><th>Plan</th><th>Price</th><th>License Key</th><th>Status</th></tr></thead><tbody>';
+    result.businesses.forEach(function(b) {
+        var price = AED_PRICES[b.plan] || 0;
+        html += '<tr>';
+        html += '<td style="font-weight:500;">' + esc(b.name) + '</td>';
+        html += '<td><span class="badge badge-blue">' + (b.plan || 'N/A') + '</span></td>';
+        html += '<td style="font-weight:600;color:var(--accent);">AED ' + price + '/mo</td>';
+        html += '<td style="font-family:monospace;font-size:10px;">' + (b.licenseKey ? b.licenseKey.substring(0, 18) + '...' : 'N/A') + '</td>';
+        html += '<td>' + (b.status === 'active' ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-red">' + (b.status || 'Unknown') + '</span>') + '</td>';
+        html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+}
 
-        function loadBusinesses() {
-            api('adminGetBusinesses', {}, function(result) {
-                var container = document.getElementById('businesses-list');
-                if (!result.businesses?.length) { container.innerHTML = '<p style="padding:30px;text-align:center;">No businesses registered yet.</p>'; return; }
-                var html = '<div class="table-wrap"><table><thead><tr><th>Business</th><th>Plan</th><th>Price</th><th>Email</th><th>Items</th><th>Status</th></tr></thead><tbody>';
-                result.businesses.forEach(function(b) {
-                    var price = AED_PRICES[b.plan] || 0;
-                    html += '<tr><td style="font-weight:500;">' + esc(b.name) + '</td><td>' + (b.plan || 'N/A') + '</td><td style="font-weight:600;color:var(--accent);">AED ' + price + '/mo</td><td style="font-size:12px;">' + esc(b.email) + '</td><td style="text-align:center;">' + (b.itemCount || 0) + '</td><td>' + (b.status === 'active' ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-red">' + (b.status || 'Unknown') + '</span>') + '</td></tr>';
-                });
-                html += '</tbody></table></div>';
-                container.innerHTML = html;
-            });
-        }
+async function loadBusinesses() {
+    document.getElementById('businesses-list').innerHTML = '<p style="padding:30px;text-align:center;">Loading...</p>';
+    var result = await api('adminGetBusinesses');
+    var container = document.getElementById('businesses-list');
+    
+    if (!result.businesses || result.businesses.length === 0) {
+        container.innerHTML = '<p style="padding:30px;text-align:center;">No businesses registered yet.</p>';
+        return;
+    }
+    
+    var html = '<div class="table-wrap"><table><thead><tr><th>Business</th><th>Plan</th><th>Price</th><th>Email</th><th>Items</th><th>Status</th></tr></thead><tbody>';
+    result.businesses.forEach(function(b) {
+        var price = AED_PRICES[b.plan] || 0;
+        html += '<tr>';
+        html += '<td style="font-weight:500;">' + esc(b.name) + '</td>';
+        html += '<td>' + (b.plan || 'N/A') + '</td>';
+        html += '<td style="font-weight:600;color:var(--accent);">AED ' + price + '/mo</td>';
+        html += '<td style="font-size:12px;">' + esc(b.email) + '</td>';
+        html += '<td style="text-align:center;">' + (b.itemCount || 0) + '</td>';
+        html += '<td>' + (b.status === 'active' ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-red">' + (b.status || 'Unknown') + '</span>') + '</td>';
+        html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+}
 
-        function loadRevenue() {
-            api('adminGetRevenue', {}, function(result) {
-                var mrr = result.mrr || 0;
-                var arr = result.arr || 0;
-                document.getElementById('revenue-stats').innerHTML = 
-                    '<div class="stat-card"><div class="stat-label">Monthly Revenue</div><div class="stat-value accent">AED ' + mrr.toLocaleString() + '</div></div>' +
-                    '<div class="stat-card"><div class="stat-label">Annual Run Rate</div><div class="stat-value">AED ' + arr.toLocaleString() + '</div></div>' +
-                    '<div class="stat-card"><div class="stat-label">Active Businesses</div><div class="stat-value">' + (result.activeBusinesses || 0) + '</div></div>' +
-                    '<div class="stat-card"><div class="stat-label">5-Year Value</div><div class="stat-value" style="color:var(--accent);">AED ' + (mrr * 60).toLocaleString() + '</div></div>';
-                
-                var bd = document.getElementById('revenue-breakdown');
-                if (!result.breakdown?.length) { bd.innerHTML = '<p style="padding:30px;text-align:center;">No active subscriptions yet.</p>'; return; }
-                var html = '<div class="table-wrap"><table><thead><tr><th>Business</th><th>Plan</th><th>Monthly (AED)</th><th>Annual (AED)</th></tr></thead><tbody>';
-                result.breakdown.forEach(function(b) {
-                    var price = AED_PRICES[b.plan] || 0;
-                    html += '<tr><td style="font-weight:500;">' + esc(b.name) + '</td><td>' + (b.plan || 'N/A') + '</td><td style="font-weight:600;color:var(--accent);">AED ' + price + '</td><td>AED ' + (price * 12).toLocaleString() + '</td></tr>';
-                });
-                html += '<tr style="font-weight:700;border-top:2px solid var(--border);background:#f8fafc;"><td colspan="2">Total MRR</td><td style="color:var(--accent);">AED ' + mrr.toLocaleString() + '</td><td>AED ' + arr.toLocaleString() + '</td></tr></tbody></table></div>';
-                bd.innerHTML = html;
-            });
-        }
+async function loadRevenue() {
+    var result = await api('adminGetRevenue');
+    var mrr = result.mrr || 0;
+    var arr = result.arr || 0;
+    
+    document.getElementById('revenue-stats').innerHTML = 
+        '<div class="stat-card"><div class="stat-label">Monthly Revenue</div><div class="stat-value accent">AED ' + mrr.toLocaleString() + '</div></div>' +
+        '<div class="stat-card"><div class="stat-label">Annual Run Rate</div><div class="stat-value">AED ' + arr.toLocaleString() + '</div></div>' +
+        '<div class="stat-card"><div class="stat-label">Active Businesses</div><div class="stat-value">' + (result.activeBusinesses || 0) + '</div></div>' +
+        '<div class="stat-card"><div class="stat-label">5-Year Value</div><div class="stat-value" style="color:var(--accent);">AED ' + (mrr * 60).toLocaleString() + '</div></div>';
+    
+    var bd = document.getElementById('revenue-breakdown');
+    if (!result.breakdown || result.breakdown.length === 0) {
+        bd.innerHTML = '<p style="padding:30px;text-align:center;">No active subscriptions yet.</p>';
+        return;
+    }
+    
+    var html = '<div class="table-wrap"><table><thead><tr><th>Business</th><th>Plan</th><th>Monthly (AED)</th><th>Annual (AED)</th></tr></thead><tbody>';
+    result.breakdown.forEach(function(b) {
+        var price = AED_PRICES[b.plan] || 0;
+        html += '<tr>';
+        html += '<td style="font-weight:500;">' + esc(b.name) + '</td>';
+        html += '<td>' + (b.plan || 'N/A') + '</td>';
+        html += '<td style="font-weight:600;color:var(--accent);">AED ' + price + '</td>';
+        html += '<td>AED ' + (price * 12).toLocaleString() + '</td>';
+        html += '</tr>';
+    });
+    html += '<tr style="font-weight:700;border-top:2px solid var(--border);background:#f8fafc;"><td colspan="2">Total MRR</td><td style="color:var(--accent);">AED ' + mrr.toLocaleString() + '</td><td>AED ' + arr.toLocaleString() + '</td></tr>';
+    html += '</tbody></table></div>';
+    bd.innerHTML = html;
+}
 
-        function esc(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+// ═══════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════
+function esc(s) {
+    if (!s) return '';
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+}
 
-        function showToast(msg, type) {
-            var t = document.getElementById('toast');
-            t.textContent = msg;
-            t.className = 'toast ' + (type || '') + ' show';
-            clearTimeout(t._t);
-            t._t = setTimeout(function() { t.classList.remove('show'); }, 3000);
-        }
+function showToast(msg, type) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + (type || '') + ' show';
+    clearTimeout(t._timeout);
+    t._timeout = setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
 
-        // Init
-        if (!ADMIN_KEY) {
-            setTimeout(function() {
-                var k = prompt('Enter admin API key:');
-                if (k) { ADMIN_KEY = k; sessionStorage.setItem('vistara_admin_key', k); }
-            }, 400);
-        }
-    </script>
+// Init
+if (!ADMIN_KEY || ADMIN_KEY === 'vistara-admin-2024-secure-key-change-this') {
+    setTimeout(function() {
+        var k = prompt('Enter admin API key (or press OK for default):');
+        if (k) { ADMIN_KEY = k; sessionStorage.setItem('vistara_admin_key', k); }
+    }, 500);
+}
+</script>    
 </body>
 </html>
