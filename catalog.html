@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Catalog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --surface: #ffffff;
+            --border: #dde1e6;
+            --text: #1a1d23;
+            --muted: #6b7280;
+            --accent: #2563eb;
+            --radius: 8px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .container { max-width: 640px; margin: 0 auto; padding: 24px 16px 60px; }
+        
+        .header { text-align: center; padding: 32px 0 24px; }
+        .header h1 { font-size: 26px; font-weight: 700; color: var(--text); }
+        .header p { color: var(--muted); margin-top: 4px; font-size: 13px; }
+        
+        .product-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: var(--shadow);
+        }
+        .product-card:hover { border-color: var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .product-card:active { transform: scale(0.995); }
+        
+        .product-image { width: 100%; height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 12px; background: #f1f5f9; }
+        .product-emoji { font-size: 56px; text-align: center; padding: 40px 0; color: var(--muted); }
+        
+        .product-name { font-size: 18px; font-weight: 600; margin-bottom: 2px; }
+        .product-price { font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+        .product-desc { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+        
+        .feature-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .feature-tag {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: var(--accent);
+            font-weight: 500;
+        }
+        
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            z-index: 1000; display: none; align-items: center; justify-content: center;
+            padding: 16px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-card {
+            background: var(--surface);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        .modal-close {
+            position: sticky; top: 0; float: right;
+            background: rgba(255,255,255,0.95); border: none;
+            color: var(--text); font-size: 20px; cursor: pointer;
+            padding: 8px 14px; border-radius: 0 12px 0 8px; z-index: 10;
+            font-family: 'Inter', sans-serif;
+        }
+        .modal-close:hover { color: var(--accent); }
+        .modal-body { padding: 24px; padding-top: 0; }
+        .modal-image { width: 100%; max-height: 280px; object-fit: cover; border-radius: 8px; margin-bottom: 16px; }
+        .modal-emoji { font-size: 72px; text-align: center; padding: 30px 0; }
+        .modal-name { font-size: 22px; font-weight: 700; }
+        .modal-price { font-size: 28px; font-weight: 700; color: var(--accent); margin: 6px 0 12px; }
+        .modal-desc { color: var(--text); font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+        
+        model-viewer { width: 100%; height: 320px; border-radius: 8px; margin: 16px 0; background: #f1f5f9; }
+        
+        .empty-state { text-align: center; padding: 80px 20px; color: var(--muted); }
+        .empty-icon { font-size: 56px; margin-bottom: 12px; opacity: 0.3; }
+        .empty-title { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+        
+        .footer-note { text-align: center; padding: 32px 0 0; font-size: 11px; color: var(--muted); }
+        
+        .spinner { display: inline-block; width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        @media (max-width: 480px) {
+            .header h1 { font-size: 22px; }
+            .product-card { padding: 16px; }
+            .product-name { font-size: 16px; }
+            .product-price { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="catalogContent">
+        <div style="text-align:center;padding:80px 0;"><div class="spinner"></div></div>
+    </div>
+
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal-card" id="detailCard"></div>
+    </div>
+
+    <script>
+        var API_URL = 'https://script.google.com/macros/s/AKfycbyUnzgOmVDjTSOZ9SGHsJ99pgThsxVPOi2IhgvOZM2ZXB0Nq9RFbUZAn0N5wukSbec8ZA/exec';
+        var params = new URLSearchParams(window.location.search);
+        var bizId = params.get('biz');
+        var catalogItems = [];
+        var businessName = '';
+
+        function loadCatalog() {
+            var container = document.getElementById('catalogContent');
+            
+            if (!bizId) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">🔗</div><div class="empty-title">No Business Specified</div><p style="font-size:13px;">Please scan a valid QR code or use the correct catalog link.</p></div>';
+                return;
+            }
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', API_URL, true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText);
+                    renderCatalog(data);
+                } else {
+                    container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Unable to Load</div><p style="font-size:13px;">Please try again later.</p></div>';
+                }
+            };
+            
+            xhr.onerror = function() {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">📡</div><div class="empty-title">Connection Error</div><p style="font-size:13px;">Please check your internet connection.</p><button onclick="location.reload()" style="margin-top:12px;padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:Inter,sans-serif;font-size:13px;">🔄 Retry</button></div>';
+            };
+            
+            xhr.send('data=' + encodeURIComponent(JSON.stringify({
+                action: 'publicGetCatalog',
+                payload: { businessId: bizId }
+            })));
+        }
+
+        function renderCatalog(data) {
+            var container = document.getElementById('catalogContent');
+            
+            if (!data || data.businessName === 'Not Found' || !data.items) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">🏢</div><div class="empty-title">Business Not Found</div><p style="font-size:13px;">This business may no longer be active.</p></div>';
+                return;
+            }
+            
+            businessName = data.businessName;
+            catalogItems = data.items || [];
+            
+            if (catalogItems.length === 0) {
+                container.innerHTML = 
+                    '<div class="header"><h1>' + esc(businessName) + '</h1><p>Our Catalog</p></div>' +
+                    '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No Products Yet</div><p style="font-size:13px;">Check back soon for new items!</p></div>';
+                return;
+            }
+            
+            var html = '<div class="header"><h1>' + esc(businessName) + '</h1><p>' + catalogItems.length + ' product' + (catalogItems.length > 1 ? 's' : '') + ' available</p></div>';
+            
+            catalogItems.forEach(function(item, index) {
+                html += '<div class="product-card" onclick="showDetail(' + index + ')" role="button" tabindex="0">';
+                
+                if (item.imageUrl) {
+                    html += '<img class="product-image" src="' + esc(item.imageUrl) + '" alt="' + esc(item.name) + '" loading="lazy" onerror="this.style.display=\'none\'">';
+                } else {
+                    html += '<div class="product-emoji">📦</div>';
+                }
+                
+                html += '<div class="product-name">' + esc(item.name) + '</div>';
+                html += '<div class="product-price">' + esc(item.price) + '</div>';
+                
+                if (item.description) {
+                    html += '<div class="product-desc">' + esc(item.description) + '</div>';
+                }
+                
+                if (item.features) {
+                    html += '<div class="feature-tags">';
+                    item.features.split(',').slice(0, 4).forEach(function(f) {
+                        html += '<span class="feature-tag">' + esc(f.trim()) + '</span>';
+                    });
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+            });
+            
+            html += '<div class="footer-note">Powered by <strong>Vistara</strong> — 3D Commerce Platform</div>';
+            container.innerHTML = html;
+        }
+
+        function showDetail(index) {
+            var item = catalogItems[index];
+            if (!item) return;
+            
+            var card = document.getElementById('detailCard');
+            var html = '<button class="modal-close" onclick="closeDetail()">✕</button><div class="modal-body">';
+            
+            if (item.imageUrl) {
+                html += '<img class="modal-image" src="' + esc(item.imageUrl) + '" alt="' + esc(item.name) + '" onerror="this.style.display=\'none\'">';
+            } else {
+                html += '<div class="modal-emoji">📦</div>';
+            }
+            
+            html += '<div class="modal-name">' + esc(item.name) + '</div>';
+            html += '<div class="modal-price">' + esc(item.price) + '</div>';
+            
+            if (item.description) {
+                html += '<div class="modal-desc">' + esc(item.description) + '</div>';
+            }
+            
+            if (item.features) {
+                html += '<div class="feature-tags" style="margin-bottom:16px;">';
+                item.features.split(',').forEach(function(f) {
+                    html += '<span class="feature-tag">' + esc(f.trim()) + '</span>';
+                });
+                html += '</div>';
+            }
+            
+            if (item.modelUrl) {
+                html += '<model-viewer src="' + esc(item.modelUrl) + '" camera-controls auto-rotate ar ar-modes="webxr scene-viewer quick-look" style="width:100%;height:320px;border-radius:8px;margin:16px 0;background:#f1f5f9;">';
+                html += '<div slot="ar-button" style="background:var(--accent);color:#fff;padding:8px 16px;border-radius:6px;font-family:Inter,sans-serif;font-size:12px;cursor:pointer;text-align:center;">📱 View in Your Space</div>';
+                html += '</model-viewer>';
+                html += '<p style="text-align:center;font-size:10px;color:var(--muted);margin-top:4px;">🔄 Drag to rotate · 🤏 Pinch to zoom · 📐 AR Ready</p>';
+            }
+            
+            html += '<div class="footer-note" style="padding-top:16px;">Powered by <strong>Vistara</strong></div>';
+            html += '</div>';
+            
+            card.innerHTML = html;
+            document.getElementById('detailModal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDetail() {
+            document.getElementById('detailModal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function esc(s) {
+            if (!s) return '';
+            var d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+
+        // Close on background click
+        document.getElementById('detailModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDetail();
+        });
+
+        // Close on Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeDetail();
+        });
+
+        // Init
+        loadCatalog();
+    </script>
+</body>
+</html>
