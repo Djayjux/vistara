@@ -467,20 +467,34 @@
         // ═══════════════════════════════════════════
         // API HELPER
         // ═══════════════════════════════════════════
-        function api(action, payload, callback) {
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', API_URL, true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    var data = JSON.parse(xhr.responseText);
-                    callback(data);
-                } else {
-                    callback({ error: 'Server error: ' + xhr.status });
-                }
-            };
-            
+       async function api(action, payload) {
+    try {
+        var body = new URLSearchParams();
+        body.append('data', JSON.stringify({
+            action: action,
+            token: token,
+            payload: payload
+        }));
+
+        var response = await fetch(API_URL, {
+            method: 'POST',
+            body: body
+            // NO Content-Type header
+        });
+
+        var data = await response.json();
+
+        if (response.status === 401 && data.code && (data.code === 'EXPIRED' || data.code === 'REVOKED')) {
+            handleLogout(true);
+            return { error: 'Session expired' };
+        }
+
+        return data;
+    } catch(e) {
+        console.error('API Error:', e);
+        return { error: 'Network error' };
+    }
+}            
             xhr.onerror = function() {
                 callback({ error: 'Network error. Check your connection.' });
             };
