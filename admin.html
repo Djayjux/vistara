@@ -219,13 +219,39 @@
             'Enterprise': 1799
         };
 
-        function api(action, payload, callback) {
-            if (!ADMIN_KEY) {
-                ADMIN_KEY = prompt('Enter admin API key:');
-                if (!ADMIN_KEY) return;
-                sessionStorage.setItem('vistara_admin_key', ADMIN_KEY);
-            }
-            var xhr = new XMLHttpRequest();
+        async function api(action, payload) {
+    if (!ADMIN_KEY) {
+        ADMIN_KEY = prompt('Enter admin API key:');
+        if (!ADMIN_KEY) return { error: 'Admin key required' };
+        sessionStorage.setItem('vistara_admin_key', ADMIN_KEY);
+    }
+
+    try {
+        var body = new URLSearchParams();
+        body.append('data', JSON.stringify({
+            action: action,
+            payload: Object.assign({}, payload, { adminKey: ADMIN_KEY })
+        }));
+
+        var response = await fetch(API_URL, {
+            method: 'POST',
+            body: body
+            // NO Content-Type header — this is the key!
+        });
+
+        if (response.status === 403) {
+            ADMIN_KEY = '';
+            sessionStorage.removeItem('vistara_admin_key');
+            return { error: 'Invalid admin key' };
+        }
+
+        return await response.json();
+    } catch(e) {
+        console.error('API Error:', e);
+        return { error: 'Network error: ' + e.message };
+    }
+}
+        var xhr = new XMLHttpRequest();
             xhr.open('POST', API_URL, true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.onload = function() {
