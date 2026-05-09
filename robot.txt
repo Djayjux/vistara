@@ -2,4 +2,3 @@ User-agent: *
 Allow: /index.html
 Allow: /catalog.html
 Disallow: /admin.html
-Sitemap: https://YOUR_USERNAME.github.io/vistara-platform/sitemap.xml
