@@ -5,43 +5,305 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Catalog</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
-        :root { --bg: #f0f2f5; --surface: #ffffff; --border: #dde1e6; --text: #1a1d23; --muted: #6b7280; --accent: #2563eb; --radius: 8px; }
+        :root { --bg: #f8f9fb; --surface: #ffffff; --border: #e2e6ed; --text: #1a1d23; --muted: #6b7280; --accent: #2563eb; --success: #059669; --whatsapp: #25D366; --radius: 12px; --shadow: 0 1px 3px rgba(0,0,0,0.06); }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-        .container { max-width: 640px; margin: 0 auto; padding: 24px 16px 60px; }
-        .header { text-align: center; padding: 32px 0 24px; }
-        .header h1 { font-size: 26px; font-weight: 700; }
-        .header p { color: var(--muted); font-size: 13px; }
-        .product-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-        .product-name { font-size: 18px; font-weight: 600; }
-        .product-price { font-size: 22px; font-weight: 700; color: var(--accent); margin: 4px 0; }
-        .product-desc { color: var(--muted); font-size: 13px; }
-        .empty-state { text-align: center; padding: 80px 20px; color: var(--muted); }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; }
+        
+        .container { max-width: 680px; margin: 0 auto; padding: 20px 16px 60px; }
+        
+        /* Business Header */
+        .biz-header { text-align: center; padding: 24px 0 8px; }
+        .biz-logo { width: 80px; height: 80px; border-radius: 16px; object-fit: cover; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .biz-name { font-size: 26px; font-weight: 700; color: var(--text); }
+        .biz-desc { color: var(--muted); font-size: 13px; margin-top: 4px; max-width: 400px; margin-left: auto; margin-right: auto; }
+        .biz-contact { display: flex; justify-content: center; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+        .contact-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 500; text-decoration: none; transition: all 0.15s; }
+        .contact-btn.call { background: #eff6ff; color: var(--accent); }
+        .contact-btn.whatsapp { background: #e8f5e9; color: #1b5e20; }
+        .contact-btn.web { background: #f5f5f5; color: var(--text); }
+        .contact-btn.instagram { background: #fce4ec; color: #c62828; }
+        
+        /* Search */
+        .search-bar { margin: 16px 0; }
+        .search-input { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 25px; font-family: 'Inter', sans-serif; font-size: 14px; outline: none; background: var(--surface); box-shadow: var(--shadow); }
+        .search-input:focus { border-color: var(--accent); }
+        
+        /* Categories */
+        .categories { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+        .cat-btn { padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--muted); transition: all 0.15s; font-family: 'Inter', sans-serif; }
+        .cat-btn:hover, .cat-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        
+        /* Products */
+        .product-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 14px; box-shadow: var(--shadow); transition: all 0.2s; cursor: pointer; position: relative; }
+        .product-card:hover { border-color: var(--accent); box-shadow: 0 6px 20px rgba(0,0,0,0.1); transform: translateY(-2px); }
+        .product-card:active { transform: scale(0.99); }
+        .featured-badge { position: absolute; top: 12px; left: 12px; background: #f59e0b; color: #fff; font-size: 10px; padding: 4px 10px; border-radius: 12px; font-weight: 600; z-index: 2; }
+        .product-image { width: 100%; height: 220px; object-fit: cover; }
+        .product-emoji { width: 100%; height: 220px; display: flex; align-items: center; justify-content: center; font-size: 64px; background: #f1f5f9; }
+        .product-body { padding: 16px; }
+        .product-category { font-size: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 4px; }
+        .product-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .product-price { font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+        .product-desc { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+        .product-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+        .product-tag { font-size: 10px; padding: 3px 8px; border-radius: 10px; background: #eff6ff; color: var(--accent); font-weight: 500; }
+        
+        /* Detail Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 16px; }
+        .modal-overlay.open { display: flex; }
+        .modal-card { background: var(--surface); border-radius: 16px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.25); }
+        .modal-close-btn { position: sticky; top: 0; float: right; background: rgba(0,0,0,0.5); color: #fff; border: none; font-size: 22px; cursor: pointer; padding: 10px 16px; border-radius: 0 16px 0 12px; z-index: 10; }
+        .modal-image { width: 100%; max-height: 300px; object-fit: cover; }
+        .modal-emoji { font-size: 80px; text-align: center; padding: 40px 0; background: #f1f5f9; }
+        .modal-content { padding: 20px; }
+        .modal-name { font-size: 22px; font-weight: 700; }
+        .modal-price { font-size: 28px; font-weight: 700; color: var(--accent); margin: 6px 0 12px; }
+        .modal-desc { color: var(--text); font-size: 14px; line-height: 1.7; margin-bottom: 12px; }
+        .modal-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+        .modal-tag { font-size: 10px; padding: 4px 10px; border-radius: 12px; background: #eff6ff; color: var(--accent); }
+        .modal-gallery { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 16px; padding-bottom: 8px; }
+        .modal-gallery img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid transparent; }
+        .modal-gallery img:hover { border-color: var(--accent); }
+        
+        model-viewer { width: 100%; height: 320px; border-radius: 12px; margin: 16px 0; background: #f1f5f9; }
+        
+        /* Inquiry Form */
+        .inquiry-form { background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-top: 16px; }
+        .inquiry-form h4 { margin-bottom: 12px; font-size: 15px; }
+        .inq-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 13px; margin-bottom: 8px; outline: none; }
+        .inq-input:focus { border-color: var(--accent); }
+        .inq-textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 13px; height: 70px; resize: vertical; margin-bottom: 8px; outline: none; }
+        .inq-submit { width: 100%; padding: 12px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .inq-submit:hover { opacity: 0.9; }
+        .inq-success { text-align: center; padding: 20px; color: var(--success); font-weight: 600; }
+        
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
         .spinner { display: inline-block; width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .footer-note { text-align: center; padding: 24px 0 0; font-size: 11px; color: var(--muted); }
+        
+        @media (max-width: 480px) { .biz-name { font-size: 22px; } .product-image { height: 180px; } .modal-image { max-height: 220px; } }
     </style>
 </head>
 <body>
-    <div class="container" id="catalogContent"><div style="text-align:center;padding:80px;"><div class="spinner"></div></div></div>
+    <div class="container" id="catalogContent">
+        <div style="text-align:center;padding:80px 0;"><div class="spinner"></div></div>
+    </div>
+
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal-card" id="detailCard"></div>
+    </div>
+
     <script>
         var API_URL = 'https://script.google.com/macros/s/AKfycbyhRyUXpBsGX0YdV61gT-IyEsZSlGj4MIYsTbsifhpd-FI8zRjcBPljuHMAAw4C4KXo/exec';
-        var p = new URLSearchParams(location.search);
-        var bizId = p.get('biz');
+        var params = new URLSearchParams(location.search);
+        var bizId = params.get('biz');
+        var catalogItems = [];
+        var businessData = null;
+        var currentFilter = 'All';
 
-        if (!bizId) { document.getElementById('catalogContent').innerHTML = '<div class="empty-state"><h2>No business specified</h2></div>'; }
-        else {
+        if (!bizId) { document.getElementById('catalogContent').innerHTML = '<div class="empty-state"><h3>No business specified</h3><p>Please scan a valid QR code.</p></div>'; }
+        else { loadCatalog(); }
+
+        function loadCatalog() {
             var body = new URLSearchParams();
             body.append('data', JSON.stringify({ action: 'publicGetCatalog', payload: { businessId: bizId } }));
-            fetch(API_URL, { method: 'POST', body: body }).then(function(r) { return r.json(); }).then(function(d) {
-                var c = document.getElementById('catalogContent');
-                if (!d || d.businessName === 'Not Found' || !d.items) { c.innerHTML = '<div class="empty-state"><h2>Business Not Found</h2></div>'; return; }
-                if (!d.items.length) { c.innerHTML = '<div class="header"><h1>' + esc(d.businessName) + '</h1></div><div class="empty-state"><p>No products yet.</p></div>'; return; }
-                var h = '<div class="header"><h1>' + esc(d.businessName) + '</h1><p>' + d.items.length + ' products</p></div>';
-                d.items.forEach(function(i) { h += '<div class="product-card"><div class="product-name">' + esc(i.name) + '</div><div class="product-price">' + esc(i.price) + '</div>' + (i.description ? '<div class="product-desc">' + esc(i.description) + '</div>' : '') + '</div>'; });
-                c.innerHTML = h;
-            }).catch(function() { document.getElementById('catalogContent').innerHTML = '<div class="empty-state"><p>Error loading catalog.</p></div>'; });
+            
+            fetch(API_URL, { method: 'POST', body: body })
+                .then(function(r) { return r.json(); })
+                .then(function(data) { renderCatalog(data); })
+                .catch(function() { document.getElementById('catalogContent').innerHTML = '<div class="empty-state"><p>Error loading catalog.</p><button onclick="location.reload()" style="margin-top:8px;padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;">Retry</button></div>'; });
         }
+
+        function renderCatalog(data) {
+            var container = document.getElementById('catalogContent');
+            
+            if (!data || data.businessName === 'Not Found' || !data.items) {
+                container.innerHTML = '<div class="empty-state"><h3>Business Not Found</h3><p>This business may no longer be active.</p></div>';
+                return;
+            }
+            
+            businessData = data;
+            catalogItems = data.items || [];
+            
+            if (catalogItems.length === 0) {
+                container.innerHTML = buildHeader(data) + '<div class="empty-state"><p style="font-size:48px;">📭</p><h3>No Products Yet</h3><p>Check back soon!</p></div>';
+                return;
+            }
+
+            // Get unique categories
+            var categories = ['All'];
+            catalogItems.forEach(function(i) {
+                var cat = i.category || 'General';
+                if (categories.indexOf(cat) === -1) categories.push(cat);
+            });
+
+            container.innerHTML = 
+                buildHeader(data) +
+                '<div class="search-bar"><input class="search-input" type="text" id="searchInput" placeholder="🔍 Search products..." onkeyup="filterItems()"></div>' +
+                '<div class="categories">' + categories.map(function(c) { return '<button class="cat-btn' + (c === 'All' ? ' active' : '') + '" onclick="filterByCategory(\'' + c + '\', this)">' + c + '</button>'; }).join('') + '</div>' +
+                '<div id="productsGrid"></div>' +
+                '<div class="footer-note">Powered by <strong>Vistara</strong> — 3D Commerce Platform</div>';
+            
+            renderProducts();
+        }
+
+        function buildHeader(data) {
+            var html = '<div class="biz-header">';
+            if (data.businessLogo) html += '<img class="biz-logo" src="' + esc(data.businessLogo) + '" alt="Logo" onerror="this.style.display=\'none\'">';
+            html += '<h1 class="biz-name">' + esc(data.businessName) + '</h1>';
+            if (data.businessDescription) html += '<p class="biz-desc">' + esc(data.businessDescription) + '</p>';
+            
+            var contacts = [];
+            if (data.businessPhone) contacts.push('<a class="contact-btn call" href="tel:' + esc(data.businessPhone) + '">📞 Call</a>');
+            if (data.businessWhatsapp) contacts.push('<a class="contact-btn whatsapp" href="https://wa.me/' + esc(data.businessWhatsapp.replace(/[^0-9]/g,'')) + '" target="_blank">💬 WhatsApp</a>');
+            if (data.businessWebsite) contacts.push('<a class="contact-btn web" href="' + esc(data.businessWebsite) + '" target="_blank">🌐 Website</a>');
+            if (data.businessInstagram) contacts.push('<a class="contact-btn instagram" href="https://instagram.com/' + esc(data.businessInstagram.replace('@','')) + '" target="_blank">📷 Instagram</a>');
+            
+            if (contacts.length > 0) html += '<div class="biz-contact">' + contacts.join('') + '</div>';
+            html += '</div>';
+            return html;
+        }
+
+        function renderProducts() {
+            var searchTerm = (document.getElementById('searchInput')?.value || '').toLowerCase();
+            var filtered = catalogItems.filter(function(i) {
+                var matchesCat = currentFilter === 'All' || (i.category || 'General') === currentFilter;
+                var matchesSearch = !searchTerm || (i.name || '').toLowerCase().indexOf(searchTerm) !== -1 || (i.description || '').toLowerCase().indexOf(searchTerm) !== -1;
+                return matchesCat && matchesSearch;
+            });
+
+            // Sort: featured first
+            filtered.sort(function(a, b) {
+                if (a.featured === 'Yes' && b.featured !== 'Yes') return -1;
+                if (a.featured !== 'Yes' && b.featured === 'Yes') return 1;
+                return 0;
+            });
+
+            var grid = document.getElementById('productsGrid');
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><p>No products match your search.</p></div>';
+                return;
+            }
+
+            grid.innerHTML = filtered.map(function(item, index) {
+                var originalIndex = catalogItems.indexOf(item);
+                var featuredTag = item.featured === 'Yes' ? '<span class="featured-badge">⭐ Featured</span>' : '';
+                return '<div class="product-card" onclick="showDetail(' + originalIndex + ')">' +
+                    featuredTag +
+                    (item.imageUrl ? '<img class="product-image" src="' + esc(item.imageUrl) + '" alt="' + esc(item.name) + '" loading="lazy" onerror="this.parentElement.querySelector(\'.product-image\').style.display=\'none\'">' : '<div class="product-emoji">📦</div>') +
+                    '<div class="product-body">' +
+                    '<div class="product-category">' + esc(item.category || 'General') + '</div>' +
+                    '<div class="product-name">' + esc(item.name) + '</div>' +
+                    '<div class="product-price">' + esc(item.price) + '</div>' +
+                    (item.description ? '<div class="product-desc">' + esc(item.description) + '</div>' : '') +
+                    (item.features ? '<div class="product-tags">' + item.features.split(',').slice(0,4).map(function(f) { return '<span class="product-tag">' + esc(f.trim()) + '</span>'; }).join('') + '</div>' : '') +
+                    '</div></div>';
+            }).join('');
+        }
+
+        window.filterByCategory = function(cat, btn) {
+            currentFilter = cat;
+            document.querySelectorAll('.cat-btn').forEach(function(b) { b.classList.remove('active'); });
+            if (btn) btn.classList.add('active');
+            renderProducts();
+        };
+
+        window.filterItems = function() {
+            renderProducts();
+        };
+
+        window.showDetail = function(index) {
+            var item = catalogItems[index];
+            if (!item) return;
+            
+            var card = document.getElementById('detailCard');
+            var images = [];
+            if (item.imageUrl) images.push(item.imageUrl);
+            if (item.imageUrl2) images.push(item.imageUrl2);
+            if (item.imageUrl3) images.push(item.imageUrl3);
+            
+            var html = '<button class="modal-close-btn" onclick="closeDetail()">✕</button>';
+            
+            if (images.length > 0) {
+                html += '<img class="modal-image" src="' + esc(images[0]) + '" alt="' + esc(item.name) + '" onerror="this.style.display=\'none\'">';
+                if (images.length > 1) {
+                    html += '<div class="modal-gallery">' + images.map(function(img) { return '<img src="' + esc(img) + '" onclick="this.parentElement.parentElement.querySelector(\'.modal-image\').src=\'' + esc(img) + '\'" onerror="this.style.display=\'none\'">'; }).join('') + '</div>';
+                }
+            } else {
+                html += '<div class="modal-emoji">📦</div>';
+            }
+            
+            html += '<div class="modal-content">';
+            html += '<div class="modal-name">' + esc(item.name) + '</div>';
+            html += '<div class="modal-price">' + esc(item.price) + '</div>';
+            if (item.description) html += '<div class="modal-desc">' + esc(item.description) + '</div>';
+            if (item.features) html += '<div class="modal-tags">' + item.features.split(',').map(function(f) { return '<span class="modal-tag">' + esc(f.trim()) + '</span>'; }).join('') + '</div>';
+            
+            if (item.modelUrl) {
+                html += '<model-viewer src="' + esc(item.modelUrl) + '" camera-controls auto-rotate ar ar-modes="webxr scene-viewer quick-look" style="width:100%;height:320px;border-radius:12px;margin:16px 0;background:#f1f5f9;"><div slot="ar-button" style="background:var(--accent);color:#fff;padding:10px 18px;border-radius:8px;font-family:Inter,sans-serif;font-size:13px;cursor:pointer;text-align:center;">📱 View in Your Space</div></model-viewer>';
+                html += '<p style="text-align:center;font-size:10px;color:var(--muted);">🔄 Drag to rotate · 🤏 Pinch to zoom · 📐 AR Ready</p>';
+            }
+            
+            // Contact buttons
+            var contactHtml = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">';
+            if (businessData.businessPhone) contactHtml += '<a class="contact-btn call" href="tel:' + esc(businessData.businessPhone) + '">📞 Call</a>';
+            if (businessData.businessWhatsapp) contactHtml += '<a class="contact-btn whatsapp" href="https://wa.me/' + esc(businessData.businessWhatsapp.replace(/[^0-9]/g,'')) + '?text=I am interested in ' + encodeURIComponent(item.name) + '" target="_blank">💬 WhatsApp</a>';
+            contactHtml += '</div>';
+            if (businessData.businessPhone || businessData.businessWhatsapp) html += contactHtml;
+            
+            // Inquiry Form
+            html += '<div class="inquiry-form" id="inquiryForm">';
+            html += '<h4>📩 Inquire About This Product</h4>';
+            html += '<input class="inq-input" id="inqName" placeholder="Your Name *">';
+            html += '<input class="inq-input" id="inqPhone" placeholder="Phone Number *" type="tel">';
+            html += '<input class="inq-input" id="inqEmail" placeholder="Email (optional)" type="email">';
+            html += '<textarea class="inq-textarea" id="inqMessage" placeholder="I am interested in this product. Please contact me."></textarea>';
+            html += '<button class="inq-submit" onclick="submitInquiry(\'' + esc(item.name) + '\')">Send Inquiry</button>';
+            html += '</div>';
+            
+            html += '<div class="footer-note">Powered by <strong>Vistara</strong></div>';
+            html += '</div>';
+            
+            card.innerHTML = html;
+            document.getElementById('detailModal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.submitInquiry = function(itemName) {
+            var name = document.getElementById('inqName').value.trim();
+            var phone = document.getElementById('inqPhone').value.trim();
+            var email = document.getElementById('inqEmail').value.trim();
+            var message = document.getElementById('inqMessage').value.trim();
+            
+            if (!name || !phone) { alert('Please enter your name and phone number.'); return; }
+            
+            var body = new URLSearchParams();
+            body.append('data', JSON.stringify({
+                action: 'submitInquiry',
+                payload: { businessId: bizId, itemName: itemName, name: name, phone: phone, email: email, message: message }
+            }));
+            
+            fetch(API_URL, { method: 'POST', body: body })
+                .then(function(r) { return r.json(); })
+                .then(function(res) {
+                    if (res.success) {
+                        document.getElementById('inquiryForm').innerHTML = '<div class="inq-success">✅ Inquiry sent successfully!<br><small>The business will contact you soon.</small></div>';
+                    } else {
+                        alert(res.error || 'Failed to send. Please try again.');
+                    }
+                });
+        };
+
+        window.closeDetail = function() {
+            document.getElementById('detailModal').classList.remove('open');
+            document.body.style.overflow = '';
+        };
+
+        document.getElementById('detailModal').addEventListener('click', function(e) { if (e.target === this) closeDetail(); });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeDetail(); });
 
         function esc(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
     </script>
