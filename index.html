@@ -7,871 +7,178 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        :root {
-            --bg: #f0f2f5;
-            --surface: #ffffff;
-            --border: #dde1e6;
-            --text: #1a1d23;
-            --muted: #6b7280;
-            --accent: #2563eb;
-            --accent-hover: #1d4ed8;
-            --success: #059669;
-            --danger: #dc2626;
-            --radius: 8px;
-            --shadow: 0 1px 3px rgba(0,0,0,0.06);
-        }
-        
+        :root { --bg: #f0f2f5; --surface: #ffffff; --border: #dde1e6; --text: #1a1d23; --muted: #6b7280; --accent: #2563eb; --accent-hover: #1d4ed8; --success: #059669; --danger: #dc2626; --radius: 8px; --shadow: 0 1px 3px rgba(0,0,0,0.06); }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-        }
-        
-        /* AUTH SCREENS */
-        .auth-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 24px;
-            background: linear-gradient(180deg, #f0f2f5 0%, #dde1e6 100%);
-        }
-        .auth-card {
-            background: var(--surface);
-            border-radius: 12px;
-            padding: 40px;
-            width: 440px;
-            max-width: 95vw;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-        }
-        .auth-logo {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--accent);
-            text-align: center;
-            margin-bottom: 4px;
-        }
-        .auth-subtitle {
-            color: var(--muted);
-            font-size: 13px;
-            text-align: center;
-            margin-bottom: 32px;
-        }
-        
-        /* APP SHELL */
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        .auth-wrapper { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+        .auth-card { background: var(--surface); border-radius: 12px; padding: 40px; width: 440px; max-width: 95vw; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+        .auth-logo { font-size: 24px; font-weight: 700; color: var(--accent); text-align: center; }
+        .auth-subtitle { color: var(--muted); font-size: 13px; text-align: center; margin-bottom: 32px; }
         .app-container { display: none; }
         .app-container.active { display: flex; }
-        
-        .sidebar {
-            width: 240px;
-            background: var(--surface);
-            border-right: 1px solid var(--border);
-            min-height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            z-index: 50;
-            box-shadow: var(--shadow);
-            display: flex;
-            flex-direction: column;
-        }
-        .sidebar-brand {
-            padding: 24px 20px;
-            border-bottom: 1px solid var(--border);
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--accent);
-        }
-        .sidebar-business {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
-        }
+        .sidebar { width: 240px; background: var(--surface); border-right: 1px solid var(--border); min-height: 100vh; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; display: flex; flex-direction: column; }
+        .sidebar-brand { padding: 24px 20px; border-bottom: 1px solid var(--border); font-size: 18px; font-weight: 700; color: var(--accent); }
+        .sidebar-business { padding: 16px 20px; border-bottom: 1px solid var(--border); }
         .sidebar-biz-name { font-weight: 600; font-size: 14px; }
-        .sidebar-biz-plan { font-size: 11px; color: var(--muted); margin-top: 2px; }
+        .sidebar-biz-plan { font-size: 11px; color: var(--muted); }
         .sidebar-nav { flex: 1; padding: 12px 8px; }
-        .sidebar-nav a {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--muted);
-            text-decoration: none;
-            margin-bottom: 2px;
-            transition: all 0.15s;
-        }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--muted); text-decoration: none; margin-bottom: 2px; }
         .sidebar-nav a:hover { background: #f0f2f5; color: var(--text); }
         .sidebar-nav a.active { background: #eff6ff; color: var(--accent); font-weight: 600; }
         .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
-        
         .main-content { margin-left: 240px; flex: 1; }
-        .topbar {
-            height: 56px;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            padding: 0 24px;
-            gap: 16px;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 40;
-        }
+        .topbar { height: 56px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; box-shadow: var(--shadow); position: sticky; top: 0; }
         .topbar-title { font-size: 16px; font-weight: 600; flex: 1; }
         .content-area { padding: 24px; }
         .page { display: none; }
-        .page.active { display: block; animation: fadeIn 0.2s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* COMPONENTS */
-        .btn {
-            padding: 9px 16px;
-            border-radius: 6px;
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            border: 1px solid transparent;
-            transition: all 0.15s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
+        .page.active { display: block; }
+        .btn { padding: 9px 16px; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 13px; cursor: pointer; border: 1px solid transparent; }
         .btn-primary { background: var(--accent); color: #fff; font-weight: 600; }
         .btn-primary:hover { background: var(--accent-hover); }
         .btn-outline { background: transparent; border-color: var(--border); color: var(--text); }
-        .btn-outline:hover { background: #f8f9fb; }
         .btn-danger { background: transparent; border-color: #fecaca; color: var(--danger); }
-        .btn-danger:hover { background: #fef2f2; }
         .btn-sm { padding: 6px 12px; font-size: 12px; }
-        
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-        }
-        .card-header {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 14px;
-            margin-bottom: 24px;
-        }
-        .stat-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 18px;
-            box-shadow: var(--shadow);
-        }
-        .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        .stat-value { font-size: 24px; font-weight: 700; margin-top: 4px; }
-        
-        .items-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 14px;
-        }
-        .item-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: all 0.15s;
-        }
-        .item-card:hover { border-color: var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .item-preview {
-            height: 160px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f1f5f9;
-            font-size: 48px;
-            color: var(--muted);
-        }
-        .item-preview img { width: 100%; height: 100%; object-fit: cover; }
-        .item-body { padding: 14px; }
-        .item-name { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
-        .item-price { font-size: 18px; font-weight: 700; color: var(--accent); }
-        .item-desc { font-size: 12px; color: var(--muted); margin-top: 4px; }
-        .item-actions { display: flex; gap: 8px; margin-top: 10px; }
-        
-        .qr-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 32px;
-            text-align: center;
-            box-shadow: var(--shadow);
-        }
-        .inline-code {
-            background: #f1f5f9;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-family: 'SF Mono', 'Consolas', monospace;
-            font-size: 12px;
-            color: var(--accent);
-            word-break: break-all;
-        }
-        
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow); }
+        .card-header { font-size: 16px; font-weight: 600; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
         .form-group { margin-bottom: 14px; }
         .form-label { display: block; font-size: 12px; font-weight: 500; margin-bottom: 5px; }
-        .form-input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            outline: none;
-            transition: border-color 0.15s;
-        }
-        .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-        
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-            z-index: 1000; display: none; align-items: center; justify-content: center; padding: 16px;
-        }
+        .form-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 13px; outline: none; }
+        .form-input:focus { border-color: var(--accent); }
+        .qr-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; text-align: center; }
+        .inline-code { background: #f1f5f9; border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; font-family: 'SF Mono', 'Consolas', monospace; font-size: 12px; color: var(--accent); word-break: break-all; }
+        .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+        .item-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+        .item-preview { height: 160px; display: flex; align-items: center; justify-content: center; background: #f1f5f9; font-size: 48px; color: var(--muted); }
+        .item-body { padding: 14px; }
+        .item-name { font-weight: 600; font-size: 14px; }
+        .item-price { font-size: 18px; font-weight: 700; color: var(--accent); margin-top: 4px; }
+        .item-actions { display: flex; gap: 8px; margin-top: 10px; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 16px; }
         .modal-overlay.open { display: flex; }
-        .modal {
-            background: var(--surface);
-            border-radius: 12px;
-            width: 480px;
-            max-width: 95vw;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-        }
-        .modal-header {
-            padding: 20px 24px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .modal-header h3 { font-size: 16px; font-weight: 600; }
+        .modal { background: var(--surface); border-radius: 12px; width: 480px; max-width: 95vw; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+        .modal-header { padding: 20px 24px 0; display: flex; justify-content: space-between; align-items: center; }
         .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--muted); }
-        .modal-close:hover { color: var(--text); }
         .modal-body { padding: 20px 24px 24px; }
-        
-        .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); }
-        .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.3; }
-        
-        .toast {
-            position: fixed; bottom: 24px; right: 24px;
-            background: #1a1d23; color: #fff;
-            border-radius: 8px; padding: 12px 20px;
-            z-index: 9999; transform: translateY(80px); opacity: 0;
-            transition: all 0.3s ease; font-size: 13px; font-weight: 500;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-        }
+        .toast { position: fixed; bottom: 24px; right: 24px; background: #1a1d23; color: #fff; border-radius: 8px; padding: 12px 20px; z-index: 9999; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; font-size: 13px; }
         .toast.show { transform: translateY(0); opacity: 1; }
         .toast.error { background: var(--danger); }
         .toast.success { background: var(--success); }
-        
-        .badge {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 500;
-        }
-        .badge-blue { background: #eff6ff; color: var(--accent); }
-        .badge-green { background: #ecfdf5; color: var(--success); }
-        
-        @media (max-width: 768px) {
-            .sidebar { width: 60px; }
-            .sidebar-brand, .sidebar-biz-name, .sidebar-biz-plan, .sidebar-nav a span:last-child { display: none; }
-            .sidebar-nav a { justify-content: center; padding: 12px; font-size: 18px; }
-            .main-content { margin-left: 60px; }
-            .content-area { padding: 16px; }
-            .items-grid { grid-template-columns: 1fr; }
-        }
+        .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); }
+        @media (max-width: 768px) { .sidebar { width: 60px; } .sidebar-brand, .sidebar-biz-name, .sidebar-biz-plan, .sidebar-nav a span:last-child { display: none; } .main-content { margin-left: 60px; } }
     </style>
 </head>
 <body>
-
-    <!-- ═══════════════════════════════════════════ -->
-    <!-- LOGIN SCREEN -->
-    <!-- ═══════════════════════════════════════════ -->
     <div id="loginScreen" class="auth-wrapper">
         <div class="auth-card">
             <div class="auth-logo">Vistara</div>
-            <div class="auth-subtitle">Business Portal — Sign in to manage your 3D catalog</div>
-            
-            <div class="form-group">
-                <label class="form-label">Email Address</label>
-                <input class="form-input" type="email" id="loginEmail" placeholder="you@company.com" autocomplete="email">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Password</label>
-                <input class="form-input" type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password">
-            </div>
-            
-            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;font-size:14px;" onclick="handleLogin()">
-                🔐 Sign In
-            </button>
-            
-            <p style="text-align:center;margin-top:16px;font-size:12px;color:var(--muted);">
-                New to Vistara? 
-                <a href="#" onclick="showSignup()" style="color:var(--accent);font-weight:500;text-decoration:none;">Create account with license key</a>
-            </p>
+            <div class="auth-subtitle">Sign in to manage your 3D catalog</div>
+            <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="loginEmail" placeholder="you@company.com"></div>
+            <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="loginPassword" placeholder="Your password"></div>
+            <button class="btn btn-primary" style="width:100%;padding:12px;" onclick="handleLogin()">🔐 Sign In</button>
+            <p style="text-align:center;margin-top:16px;font-size:12px;color:var(--muted);">New? <a href="#" onclick="showSignup()" style="color:var(--accent);">Create account with license key</a></p>
         </div>
     </div>
-
-    <!-- ═══════════════════════════════════════════ -->
-    <!-- SIGNUP SCREEN -->
-    <!-- ═══════════════════════════════════════════ -->
     <div id="signupScreen" class="auth-wrapper" style="display:none;">
         <div class="auth-card">
             <div class="auth-logo">Create Account</div>
-            <div class="auth-subtitle">Enter the license key provided by your Vistara representative</div>
-            
-            <div class="form-group">
-                <label class="form-label">License Key *</label>
-                <input class="form-input" id="signupLicense" placeholder="VIST-XXXX-XXXX-XXXX">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Business Name *</label>
-                <input class="form-input" id="signupName" placeholder="e.g., Al Maha Trading Co.">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Email Address *</label>
-                <input class="form-input" type="email" id="signupEmail" placeholder="you@company.com">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Password * (minimum 8 characters)</label>
-                <input class="form-input" type="password" id="signupPassword" placeholder="Create a strong password">
-            </div>
-            
-            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;font-size:14px;" onclick="handleSignup()">
-                ✨ Create Free Account
-            </button>
-            
-            <p style="text-align:center;margin-top:16px;font-size:12px;color:var(--muted);">
-                <a href="#" onclick="showLogin()" style="color:var(--accent);font-weight:500;text-decoration:none;">← Back to sign in</a>
-            </p>
+            <div class="auth-subtitle">Enter your license key to start</div>
+            <div class="form-group"><label class="form-label">License Key</label><input class="form-input" id="signupLicense" placeholder="VIST-XXXX-XXXX-XXXX"></div>
+            <div class="form-group"><label class="form-label">Business Name</label><input class="form-input" id="signupName"></div>
+            <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="signupEmail"></div>
+            <div class="form-group"><label class="form-label">Password (min 8 chars)</label><input class="form-input" type="password" id="signupPassword"></div>
+            <button class="btn btn-primary" style="width:100%;padding:12px;" onclick="handleSignup()">✨ Create Account</button>
+            <p style="text-align:center;margin-top:16px;"><a href="#" onclick="showLogin()" style="color:var(--accent);">← Back</a></p>
         </div>
     </div>
-
-    <!-- ═══════════════════════════════════════════ -->
-    <!-- MAIN APPLICATION -->
-    <!-- ═══════════════════════════════════════════ -->
     <div id="appContainer" class="app-container">
-        
-        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-brand">Vistara</div>
-            <div class="sidebar-business">
-                <div class="sidebar-biz-name" id="sidebarBizName">Business</div>
-                <div class="sidebar-biz-plan" id="sidebarBizPlan">Plan</div>
-            </div>
+            <div class="sidebar-business"><div class="sidebar-biz-name" id="sidebarBizName">Business</div><div class="sidebar-biz-plan" id="sidebarBizPlan">Plan</div></div>
             <nav class="sidebar-nav" id="sidebarNav">
                 <a class="active" data-page="dashboard">📊 Dashboard</a>
                 <a data-page="items">📦 My Items</a>
                 <a data-page="qrcode">🔗 QR Code</a>
                 <a data-page="settings">⚙️ Settings</a>
             </nav>
-            <div class="sidebar-footer">
-                <button class="btn btn-outline btn-sm" style="width:100%;" onclick="handleLogout()">🚪 Sign Out</button>
-            </div>
+            <div class="sidebar-footer"><button class="btn btn-outline btn-sm" style="width:100%;" onclick="handleLogout()">🚪 Sign Out</button></div>
         </aside>
-        
-        <!-- Main -->
         <main class="main-content">
-            <div class="topbar">
-                <div class="topbar-title" id="topbarTitle">Dashboard</div>
-                <button class="btn btn-primary btn-sm" onclick="openAddItemModal()">+ Add Item</button>
-            </div>
+            <div class="topbar"><div class="topbar-title" id="topbarTitle">Dashboard</div><button class="btn btn-primary btn-sm" onclick="openAddItem()">+ Add Item</button></div>
             <div class="content-area" id="contentArea"></div>
         </main>
     </div>
-
-    <!-- ═══════════════════════════════════════════ -->
-    <!-- ADD ITEM MODAL -->
-    <!-- ═══════════════════════════════════════════ -->
-    <div class="modal-overlay" id="itemModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 id="itemModalTitle">Add New Item</h3>
-                <button class="modal-close" onclick="closeModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="editItemId">
-                <div class="form-group">
-                    <label class="form-label">Product Name *</label>
-                    <input class="form-input" id="itemName" placeholder="e.g., Premium Leather Sofa">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Price *</label>
-                    <input class="form-input" id="itemPrice" placeholder="$1,299">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-input" id="itemDesc" placeholder="Brief product description..." style="height:70px;resize:vertical;"></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Features (comma separated)</label>
-                    <input class="form-input" id="itemFeatures" placeholder="Premium leather, Solid wood frame, 5-year warranty">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Image URL</label>
-                    <input class="form-input" id="itemImage" placeholder="https://example.com/product-image.jpg">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">3D Model URL (.glb file)</label>
-                    <input class="form-input" id="itemModel" placeholder="https://example.com/product-model.glb">
-                </div>
-                <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="saveItem()">💾 Save Item</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast -->
     <div class="toast" id="toast"></div>
-
     <script>
-        // ═══════════════════════════════════════════
-        // CONFIGURATION
-        // ═══════════════════════════════════════════
-        var API_URL = 'https://script.google.com/macros/s/AKfycbyUnzgOmVDjTSOZ9SGHsJ99pgThsxVPOi2IhgvOZM2ZXB0Nq9RFbUZAn0N5wukSbec8ZA/exec';
+        var API_URL = 'https://script.google.com/macros/s/AKfycbyhRyUXpBsGX0YdV61gT-IyEsZSlGj4MIYsTbsifhpd-FI8zRjcBPljuHMAAw4C4KXo/exec';
         var token = localStorage.getItem('vtoken') || '';
         var business = null;
         try { business = JSON.parse(localStorage.getItem('vbiz') || 'null'); } catch(e) { business = null; }
 
-        // ═══════════════════════════════════════════
-        // API HELPER
-        // ═══════════════════════════════════════════
-       async function api(action, payload) {
-    try {
-        var body = new URLSearchParams();
-        body.append('data', JSON.stringify({
-            action: action,
-            token: token,
-            payload: payload
-        }));
-
-        var response = await fetch(API_URL, {
-            method: 'POST',
-            body: body
-            // NO Content-Type header
-        });
-
-        var data = await response.json();
-
-        if (response.status === 401 && data.code && (data.code === 'EXPIRED' || data.code === 'REVOKED')) {
-            handleLogout(true);
-            return { error: 'Session expired' };
+        async function api(action, payload) {
+            var body = new URLSearchParams();
+            body.append('data', JSON.stringify({ action: action, payload: payload, token: token }));
+            try { var r = await fetch(API_URL, { method: 'POST', body: body }); return await r.json(); } catch(e) { return { error: 'Network error' }; }
         }
 
-        return data;
-    } catch(e) {
-        console.error('API Error:', e);
-        return { error: 'Network error' };
-    }
-}            
-            xhr.onerror = function() {
-                callback({ error: 'Network error. Check your connection.' });
-            };
-            
-            xhr.send('data=' + encodeURIComponent(JSON.stringify({
-                action: action,
-                token: token,
-                payload: payload
-            })));
-        }
+        function showSignup() { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('signupScreen').style.display = 'flex'; }
+        function showLogin() { document.getElementById('signupScreen').style.display = 'none'; document.getElementById('loginScreen').style.display = 'flex'; }
 
-        // ═══════════════════════════════════════════
-        // AUTH
-        // ═══════════════════════════════════════════
-        function showSignup() {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('signupScreen').style.display = 'flex';
-        }
-
-        function showLogin() {
-            document.getElementById('signupScreen').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'flex';
-        }
-
-        function handleLogin() {
+        async function handleLogin() {
             var email = document.getElementById('loginEmail').value.trim();
             var pass = document.getElementById('loginPassword').value;
-            
-            if (!email || !pass) {
-                showToast('Please enter your email and password.', 'error');
-                return;
-            }
-            
-            api('businessLogin', { email: email, password: pass }, function(res) {
-                if (res.success) {
-                    token = res.token;
-                    business = res.business;
-                    localStorage.setItem('vtoken', token);
-                    localStorage.setItem('vbiz', JSON.stringify(business));
-                    showApp();
-                    showToast('Welcome back, ' + business.name + '!', 'success');
-                } else {
-                    showToast(res.error || 'Login failed. Please try again.', 'error');
-                }
-            });
+            if (!email || !pass) return showToast('Fill all fields', 'error');
+            var res = await api('businessLogin', { email: email, password: pass });
+            if (res.success) { token = res.token; business = res.business; localStorage.setItem('vtoken', token); localStorage.setItem('vbiz', JSON.stringify(business)); showApp(); showToast('Welcome, ' + business.name + '!', 'success'); }
+            else showToast(res.error || 'Login failed', 'error');
         }
 
-        function handleSignup() {
-            var license = document.getElementById('signupLicense').value.trim();
+        async function handleSignup() {
+            var lic = document.getElementById('signupLicense').value.trim();
             var name = document.getElementById('signupName').value.trim();
             var email = document.getElementById('signupEmail').value.trim();
             var pass = document.getElementById('signupPassword').value;
-            
-            if (!license || !name || !email || !pass) {
-                showToast('All fields including license key are required.', 'error');
-                return;
-            }
-            
-            if (pass.length < 8) {
-                showToast('Password must be at least 8 characters.', 'error');
-                return;
-            }
-            
-            api('businessSignup', { licenseKey: license, name: name, email: email, password: pass }, function(res) {
-                if (res.success) {
-                    token = res.token;
-                    business = res.business;
-                    localStorage.setItem('vtoken', token);
-                    localStorage.setItem('vbiz', JSON.stringify(business));
-                    showApp();
-                    showToast('Account created! Welcome, ' + business.name + '!', 'success');
-                } else {
-                    showToast(res.error || 'Signup failed.', 'error');
-                }
-            });
+            if (!lic || !name || !email || !pass) return showToast('All fields required', 'error');
+            if (pass.length < 8) return showToast('Password must be 8+ characters', 'error');
+            var res = await api('businessSignup', { licenseKey: lic, name: name, email: email, password: pass });
+            if (res.success) { token = res.token; business = res.business; localStorage.setItem('vtoken', token); localStorage.setItem('vbiz', JSON.stringify(business)); showApp(); showToast('Account created!', 'success'); }
+            else showToast(res.error || 'Signup failed', 'error');
         }
 
-        function handleLogout() {
-            if (token) {
-                api('logout', {}, function() {});
-            }
-            token = '';
-            business = null;
-            localStorage.removeItem('vtoken');
-            localStorage.removeItem('vbiz');
-            document.getElementById('appContainer').classList.remove('active');
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('signupScreen').style.display = 'none';
-            showToast('You have been signed out.', '');
-        }
+        function handleLogout() { token = ''; business = null; localStorage.removeItem('vtoken'); localStorage.removeItem('vbiz'); document.getElementById('appContainer').classList.remove('active'); document.getElementById('loginScreen').style.display = 'flex'; }
 
-        // ═══════════════════════════════════════════
-        // APP SHELL
-        // ═══════════════════════════════════════════
         function showApp() {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('signupScreen').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'none'; document.getElementById('signupScreen').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
-            
             document.getElementById('sidebarBizName').textContent = business.name;
             document.getElementById('sidebarBizPlan').textContent = (business.plan || 'Starter') + ' Plan';
-            
-            // Navigation
-            var links = document.querySelectorAll('#sidebarNav a');
-            links.forEach(function(link) {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    links.forEach(function(l) { l.classList.remove('active'); });
-                    link.classList.add('active');
-                    renderPage(link.dataset.page);
-                });
-            });
-            
+            document.querySelectorAll('#sidebarNav a').forEach(function(a) { a.addEventListener('click', function(e) { e.preventDefault(); document.querySelectorAll('#sidebarNav a').forEach(function(l) { l.classList.remove('active'); }); a.classList.add('active'); renderPage(a.dataset.page); }); });
             renderPage('dashboard');
         }
 
         function renderPage(page) {
             document.getElementById('topbarTitle').textContent = page.charAt(0).toUpperCase() + page.slice(1);
-            var content = document.getElementById('contentArea');
-            
-            switch(page) {
-                case 'dashboard':
-                    var catalogUrl = window.location.origin + window.location.pathname.replace('index.html','') + 'catalog.html?biz=' + business.id;
-                    content.innerHTML = 
-                        '<div class="stats-row">' +
-                            '<div class="stat-card"><div class="stat-label">Plan</div><div class="stat-value" style="font-size:18px;">' + (business.plan || 'Starter') + '</div></div>' +
-                            '<div class="stat-card"><div class="stat-label">Email</div><div class="stat-value" style="font-size:14px;">' + (business.email || '') + '</div></div>' +
-                        '</div>' +
-                        '<div class="card">' +
-                            '<div class="card-header">📋 Your Public Catalog URL</div>' +
-                            '<span class="inline-code" style="display:block;padding:14px;">' + catalogUrl + '</span>' +
-                            '<p style="font-size:12px;color:var(--muted);margin-top:8px;">Share this URL with customers or print the QR code. No login required for viewers.</p>' +
-                        '</div>';
-                    break;
-                    
-                case 'items':
-                    loadItems(content);
-                    break;
-                    
-                case 'qrcode':
-                    var qrUrl = window.location.origin + window.location.pathname.replace('index.html','') + 'catalog.html?biz=' + business.id;
-                    content.innerHTML = 
-                        '<div class="card">' +
-                            '<div class="card-header">🔗 Your QR Code</div>' +
-                            '<div class="qr-card">' +
-                                '<p style="font-weight:600;margin-bottom:16px;">Customers scan this to view your catalog</p>' +
-                                '<div id="qrDisplay" style="display:inline-block;background:#fff;padding:16px;border-radius:8px;"></div>' +
-                                '<p style="margin-top:12px;font-size:11px;color:var(--muted);word-break:break-all;">' + qrUrl + '</p>' +
-                                '<button class="btn btn-primary btn-sm" style="margin-top:12px;" onclick="downloadQR()">⬇ Download PNG</button> ' +
-                                '<button class="btn btn-outline btn-sm" style="margin-top:12px;" onclick="copyQRUrl()">📋 Copy Link</button>' +
-                            '</div>' +
-                        '</div>';
-                    setTimeout(function() {
-                        var container = document.getElementById('qrDisplay');
-                        if (container) {
-                            container.innerHTML = '';
-                            new QRCode(container, { text: qrUrl, width: 220, height: 220, colorDark: '#000000', colorLight: '#ffffff' });
-                        }
-                    }, 200);
-                    break;
-                    
-                case 'settings':
-                    content.innerHTML = 
-                        '<div class="card">' +
-                            '<div class="card-header">⚙️ Business Settings</div>' +
-                            '<div class="form-group"><label class="form-label">Business Name</label><input class="form-input" id="settingsName" value="' + esc(business.name || '') + '"></div>' +
-                            '<div class="form-group"><label class="form-label">Email</label><input class="form-input" id="settingsEmail" value="' + esc(business.email || '') + '"></div>' +
-                            '<button class="btn btn-primary" onclick="saveSettings()">💾 Save Changes</button>' +
-                        '</div>';
-                    break;
-            }
+            var c = document.getElementById('contentArea');
+            if (page === 'dashboard') { var u = location.origin + location.pathname.replace('index.html','') + 'catalog.html?biz=' + business.id; c.innerHTML = '<div class="card"><div class="card-header">📋 Your Catalog URL</div><span class="inline-code" style="display:block;padding:14px;">' + u + '</span></div>'; }
+            else if (page === 'items') loadItems(c);
+            else if (page === 'qrcode') { var q = location.origin + location.pathname.replace('index.html','') + 'catalog.html?biz=' + business.id; c.innerHTML = '<div class="card"><div class="card-header">🔗 Your QR Code</div><div class="qr-card"><div id="qrDisplay" style="display:inline-block;background:#fff;padding:16px;border-radius:8px;"></div><p style="margin-top:8px;font-size:11px;">' + q + '</p><button class="btn btn-primary btn-sm" onclick="downloadQR()">⬇ Download</button></div></div>'; setTimeout(function() { var qc = document.getElementById('qrDisplay'); if(qc){qc.innerHTML='';new QRCode(qc,{text:q,width:200,height:200,colorDark:'#000',colorLight:'#fff'});} }, 200); }
+            else if (page === 'settings') c.innerHTML = '<div class="card"><div class="card-header">Settings</div><div class="form-group"><label class="form-label">Business Name</label><input class="form-input" id="settingsName" value="' + esc(business.name) + '"></div><button class="btn btn-primary" onclick="saveSettings()">💾 Save</button></div>';
         }
 
-        // ═══════════════════════════════════════════
-        // ITEMS
-        // ═══════════════════════════════════════════
-        function loadItems(container) {
-            api('getItems', {}, function(res) {
-                var items = res.items || [];
-                
-                if (items.length === 0) {
-                    container.innerHTML = 
-                        '<div class="card">' +
-                            '<div class="card-header">My Items</div>' +
-                            '<div class="empty-state">' +
-                                '<div class="empty-icon">📦</div>' +
-                                '<p style="font-weight:500;">No items yet</p>' +
-                                '<p style="font-size:13px;margin:4px 0 16px;">Add your first product to start building your 3D catalog</p>' +
-                                '<button class="btn btn-primary" onclick="openAddItemModal()">+ Add Your First Item</button>' +
-                            '</div>' +
-                        '</div>';
-                    return;
-                }
-                
-                var html = '<div class="card"><div class="card-header">My Items (' + items.length + ')</div><div class="items-grid">';
-                
-                items.forEach(function(item) {
-                    html += '<div class="item-card">';
-                    html += '<div class="item-preview">' + (item.imageUrl ? '<img src="' + esc(item.imageUrl) + '" alt="' + esc(item.name) + '" onerror="this.style.display=\'none\';this.parentElement.textContent=\'📦\'">' : '📦') + '</div>';
-                    html += '<div class="item-body">';
-                    html += '<div class="item-name">' + esc(item.name) + '</div>';
-                    html += '<div class="item-price">' + esc(item.price) + '</div>';
-                    if (item.description) html += '<div class="item-desc">' + esc(item.description) + '</div>';
-                    html += '<div class="item-actions">';
-                    html += '<button class="btn btn-outline btn-sm" onclick="editItem(\'' + item.id + '\')">✎ Edit</button>';
-                    html += '<button class="btn btn-danger btn-sm" onclick="deleteItem(\'' + item.id + '\')">✕ Delete</button>';
-                    html += '</div></div></div>';
-                });
-                
-                html += '</div></div>';
-                container.innerHTML = html;
-            });
+        async function loadItems(c) {
+            var res = await api('getItems'); var items = res.items || [];
+            if (!items.length) { c.innerHTML = '<div class="card"><div class="card-header">My Items</div><div class="empty-state"><p>No items yet.</p><button class="btn btn-primary" onclick="openAddItem()">+ Add Item</button></div></div>'; return; }
+            var h = '<div class="card"><div class="card-header">My Items</div><div class="items-grid">';
+            items.forEach(function(i) { h += '<div class="item-card"><div class="item-preview">📦</div><div class="item-body"><div class="item-name">' + esc(i.name) + '</div><div class="item-price">' + esc(i.price) + '</div><div class="item-actions"><button class="btn btn-danger btn-sm" onclick="deleteItem(\'' + i.id + '\')">✕</button></div></div></div>'; });
+            h += '</div></div>'; c.innerHTML = h;
         }
 
-        function openAddItemModal() {
-            document.getElementById('itemModalTitle').textContent = 'Add New Item';
-            document.getElementById('editItemId').value = '';
-            document.getElementById('itemName').value = '';
-            document.getElementById('itemPrice').value = '';
-            document.getElementById('itemDesc').value = '';
-            document.getElementById('itemFeatures').value = '';
-            document.getElementById('itemImage').value = '';
-            document.getElementById('itemModel').value = '';
-            document.getElementById('itemModal').classList.add('open');
-        }
-
-        function editItem(id) {
-            api('getItems', {}, function(res) {
-                var items = res.items || [];
-                var item = items.find(function(i) { return i.id === id; });
-                if (!item) return showToast('Item not found', 'error');
-                
-                document.getElementById('itemModalTitle').textContent = 'Edit Item';
-                document.getElementById('editItemId').value = item.id;
-                document.getElementById('itemName').value = item.name || '';
-                document.getElementById('itemPrice').value = item.price || '';
-                document.getElementById('itemDesc').value = item.description || '';
-                document.getElementById('itemFeatures').value = item.features || '';
-                document.getElementById('itemImage').value = item.imageUrl || '';
-                document.getElementById('itemModel').value = item.modelUrl || '';
-                document.getElementById('itemModal').classList.add('open');
-            });
-        }
-
-        function saveItem() {
-            var name = document.getElementById('itemName').value.trim();
-            var price = document.getElementById('itemPrice').value.trim();
-            
-            if (!name || !price) {
-                showToast('Name and price are required.', 'error');
-                return;
-            }
-            
-            var editId = document.getElementById('editItemId').value;
-            var payload = {
-                name: name,
-                price: price,
-                description: document.getElementById('itemDesc').value.trim(),
-                features: document.getElementById('itemFeatures').value.trim(),
-                imageUrl: document.getElementById('itemImage').value.trim(),
-                modelUrl: document.getElementById('itemModel').value.trim()
-            };
-            
-            if (editId) payload.itemId = editId;
-            
-            api(editId ? 'updateItem' : 'addItem', payload, function(res) {
-                if (res.success) {
-                    closeModal();
-                    loadItems(document.getElementById('contentArea'));
-                    showToast(editId ? 'Item updated!' : 'Item added!', 'success');
-                } else {
-                    showToast(res.error || 'Failed to save item.', 'error');
-                }
-            });
-        }
-
-        function deleteItem(id) {
-            if (!confirm('Are you sure you want to delete this item? This cannot be undone.')) return;
-            
-            api('deleteItem', { itemId: id }, function(res) {
-                if (res.success) {
-                    loadItems(document.getElementById('contentArea'));
-                    showToast('Item deleted.', 'success');
-                } else {
-                    showToast(res.error || 'Failed to delete.', 'error');
-                }
-            });
-        }
-
-        // ═══════════════════════════════════════════
-        // SETTINGS
-        // ═══════════════════════════════════════════
-        function saveSettings() {
-            var name = document.getElementById('settingsName').value.trim();
-            var email = document.getElementById('settingsEmail').value.trim();
-            
-            if (!name) { showToast('Business name is required.', 'error'); return; }
-            
-            api('updateSettings', { name: name, email: email }, function(res) {
-                if (res.success) {
-                    business.name = name;
-                    if (email) business.email = email;
-                    localStorage.setItem('vbiz', JSON.stringify(business));
-                    document.getElementById('sidebarBizName').textContent = name;
-                    showToast('Settings saved!', 'success');
-                } else {
-                    showToast(res.error || 'Failed to save.', 'error');
-                }
-            });
-        }
-
-        // ═══════════════════════════════════════════
-        // QR CODE
-        // ═══════════════════════════════════════════
-        function downloadQR() {
-            var canvas = document.querySelector('#qrDisplay canvas');
-            if (canvas) {
-                var a = document.createElement('a');
-                a.download = 'vistara-qr-code.png';
-                a.href = canvas.toDataURL('image/png');
-                a.click();
-                showToast('QR code downloaded!', 'success');
-            }
-        }
-
-        function copyQRUrl() {
-            var url = window.location.origin + window.location.pathname.replace('index.html','') + 'catalog.html?biz=' + business.id;
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(url).then(function() {
-                    showToast('Link copied to clipboard!', 'success');
-                });
-            }
-        }
-
-        // ═══════════════════════════════════════════
-        // UTILITIES
-        // ═══════════════════════════════════════════
-        function closeModal() {
-            document.getElementById('itemModal').classList.remove('open');
-        }
-
-        function esc(s) {
-            if (!s) return '';
-            var d = document.createElement('div');
-            d.textContent = s;
-            return d.innerHTML;
-        }
-
-        function showToast(msg, type) {
-            var t = document.getElementById('toast');
-            t.textContent = msg;
-            t.className = 'toast';
-            if (type) t.classList.add(type);
-            t.classList.add('show');
-            clearTimeout(t._timer);
-            t._timer = setTimeout(function() { t.classList.remove('show'); }, 3000);
-        }
-
-        // Modal background click
-        document.getElementById('itemModal').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
-        });
-
-        // ═══════════════════════════════════════════
-        // INIT
-        // ═══════════════════════════════════════════
-        if (token && business) {
-            api('getProfile', {}, function(res) {
-                if (res.business) {
-                    business = res.business;
-                    localStorage.setItem('vbiz', JSON.stringify(business));
-                    showApp();
-                } else {
-                    handleLogout();
-                }
-            });
-        }
+        function openAddItem() { var n = prompt('Product name:'); var p = prompt('Price:'); if (n && p) { api('addItem', { name: n, price: p }).then(function(r) { if (r.success) { loadItems(document.getElementById('contentArea')); showToast('Item added', 'success'); } }); } }
+        function deleteItem(id) { if (confirm('Delete?')) { api('deleteItem', { itemId: id }).then(function() { loadItems(document.getElementById('contentArea')); }); } }
+        async function saveSettings() { var n = document.getElementById('settingsName').value.trim(); if (!n) return; await api('updateSettings', { name: n }); business.name = n; localStorage.setItem('vbiz', JSON.stringify(business)); document.getElementById('sidebarBizName').textContent = n; showToast('Saved', 'success'); }
+        function downloadQR() { var c = document.querySelector('#qrDisplay canvas'); if (c) { var a = document.createElement('a'); a.download = 'qr.png'; a.href = c.toDataURL(); a.click(); } }
+        function esc(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+        function showToast(m, t) { var o = document.getElementById('toast'); o.textContent = m; o.className = 'toast ' + (t||'') + ' show'; clearTimeout(o._t); o._t = setTimeout(function() { o.classList.remove('show'); }, 3000); }
+        if (token && business) { api('getProfile').then(function(r) { if (r.business) { business = r.business; showApp(); } else handleLogout(); }); }
     </script>
 </body>
 </html>
