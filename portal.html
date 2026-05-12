@@ -219,27 +219,29 @@
         }
 
         async function renderPage(page) {
-            document.getElementById('topbarTitle').textContent = page.charAt(0).toUpperCase() + page.slice(1);
-            var c = document.getElementById('contentArea');
-            var catalogUrl = getCatalogUrl();
+    document.getElementById('topbarTitle').textContent = page.charAt(0).toUpperCase() + page.slice(1);
+    var c = document.getElementById('contentArea');
+    c.innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p style="color:var(--muted);margin-top:12px;">Loading...</p></div>';
+    
+    var catalogUrl = getCatalogUrl();
 
-            if (page === 'dashboard') {
-                var itemsRes = await api('getItemsEnhanced');
-                var items = itemsRes.items || [];
-                var featured = items.filter(function(i) { return i.featured === 'Yes' || i.featured === true; });
-                var categories = {};
-                items.forEach(function(i) { var cat = i.category || 'General'; categories[cat] = (categories[cat] || 0) + 1; });
-                c.innerHTML = 
-                    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">' +
-                        '<div class="card" style="text-align:center;"><div style="font-size:11px;color:var(--muted);">Total Items</div><div style="font-size:24px;font-weight:700;color:var(--accent);">' + items.length + '</div></div>' +
-                        '<div class="card" style="text-align:center;"><div style="font-size:11px;color:var(--muted);">Categories</div><div style="font-size:24px;font-weight:700;">' + Object.keys(categories).length + '</div></div>' +
-                        '<div class="card" style="text-align:center;"><div style="font-size:11px;color:var(--muted);">Featured</div><div style="font-size:24px;font-weight:700;color:var(--warning);">' + featured.length + '</div></div>' +
-                        '<div class="card" style="text-align:center;"><div style="font-size:11px;color:var(--muted);">Plan</div><div style="font-size:18px;font-weight:700;">' + (business.plan || 'Starter') + '</div></div>' +
-                    '</div>' +
-                    '<div class="card"><div class="card-header">📋 Your Public Catalog</div><div style="background:#f1f5f9;padding:14px;border-radius:8px;font-family:monospace;font-size:13px;word-break:break-all;color:var(--accent);">' + catalogUrl + '</div><p style="font-size:11px;color:var(--muted);margin-top:8px;">Customers scan your QR code to see this page</p></div>' +
-                    (featured.length > 0 ? '<div class="card"><div class="card-header">⭐ Featured Items</div><div class="items-grid">' + featured.map(function(i) { return '<div class="item-card"><span class="featured-badge">⭐ Featured</span>' + (i.imageUrl ? '<img class="item-image" src="' + esc(i.imageUrl) + '" onerror="this.style.display=\'none\'">' : '<div class="item-emoji">📦</div>') + '<div class="item-body"><div class="item-category"><span class="badge badge-info">' + esc(i.category || 'General') + '</span></div><div class="item-name">' + esc(i.name) + '</div><div class="item-price">' + esc(i.price) + '</div></div></div>'; }).join('') + '</div></div>' : '');
-            }
-
+    if (page === 'dashboard') {
+        var itemsRes = await api('getItemsEnhanced');
+        var items = itemsRes.items || [];
+        var featured = items.filter(function(i) { return i.featured === 'Yes' || i.featured === true; });
+        var categories = {};
+        items.forEach(function(i) { var cat = i.category || 'General'; categories[cat] = (categories[cat] || 0) + 1; });
+        c.innerHTML = 
+            '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">' +
+                '<div class="card" style="text-align:center;"><div style="font-size:11px;color:var(--muted);">Total Items</div><div style="font-size:24px;font-weight:700;color:var(--accent);">' + items.length + '</div></div>' +
+                '<div class="card" style="text-align:center;"><div style="font-size:11px;color:var(--muted);">Categories</div><div style="font-size:24px;font-weight:700;">' + Object.keys(categories).length + '</div></div>' +
+                '<div class="card" style="text-align:center;"><div style="font-size:11px;color:var(--muted);">Featured</div><div style="font-size:24px;font-weight:700;color:var(--warning);">' + featured.length + '</div></div>' +
+                '<div class="card" style="text-align:center;"><div style="font-size:11px;color:var(--muted);">Plan</div><div style="font-size:18px;font-weight:700;">' + (business.plan || 'Starter') + '</div></div>' +
+            '</div>' +
+            '<div class="card"><div class="card-header">📋 Your Public Catalog</div><div style="background:#f1f5f9;padding:14px;border-radius:8px;font-family:monospace;font-size:13px;word-break:break-all;color:var(--accent);">' + catalogUrl + '</div></div>' +
+            (featured.length > 0 ? '<div class="card"><div class="card-header">⭐ Featured Items</div><div class="items-grid">' + featured.map(function(i) { return '<div class="item-card"><span class="featured-badge">⭐ Featured</span>' + (i.imageUrl ? '<img class="item-image" src="' + esc(i.imageUrl) + '" onerror="this.style.display=\'none\'">' : '<div class="item-emoji">📦</div>') + '<div class="item-body"><div class="item-category"><span class="badge badge-info">' + esc(i.category || 'General') + '</span></div><div class="item-name">' + esc(i.name) + '</div><div class="item-price">' + esc(i.price) + '</div></div></div>'; }).join('') + '</div></div>' : '');
+    }
+}
             else if (page === 'items') {
                 var res = await api('getItemsEnhanced');
                 var items = res.items || [];
@@ -317,7 +319,17 @@
         function showToast(m, t) { var o = document.getElementById('toast'); o.textContent = m; o.className = 'toast ' + (t||'') + ' show'; clearTimeout(o._t); o._t = setTimeout(function() { o.classList.remove('show'); }, 3000); }
 
         document.getElementById('itemModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
-        if (token && business) { api('getProfile').then(function(r) { if (r.business) { business = r.business; localStorage.setItem('vbiz', JSON.stringify(business)); showApp(); } else handleLogout(); }); }
+       if (token && business) { api('getProfile').then(function(r) { if (r.business) { business = r.business; localStorage.setItem('vbiz', JSON.stringify(business)); showApp(); } else handleLogout(); }); }
+
+        .loading-spinner {
+    text-align: center; padding: 60px 20px;
+}
+.spinner {
+    display: inline-block; width: 36px; height: 36px;
+    border: 3px solid var(--border); border-top-color: var(--accent);
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
     </script>
 </body>
 </html>
