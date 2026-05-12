@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔷</text></svg>">    <title>Vistara — Business Portal</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔷</text></svg>">    
+    <title>Vistara — Business Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
@@ -247,8 +248,7 @@
             var c = document.getElementById('contentArea');
 
             if (page === 'dashboard') {
-                var catalogUrl = location.origin + location.pathname.replace('index.html','') + 'catalog.html?biz=' + business.id;
-                var itemsRes = await api('getItemsEnhanced');
+                var catalogUrl = location.origin + location.pathname.replace('portal.html','') + 'catalog.html?biz=' + business.id;                var itemsRes = await api('getItemsEnhanced');
                 var items = itemsRes.items || [];
                 var featured = items.filter(function(i) { return i.featured === 'Yes' || i.featured === true; });
                 var totalItems = items.length;
@@ -278,8 +278,7 @@
             }
 
             else if (page === 'qrcode') {
-                var qrUrl = location.origin + location.pathname.replace('index.html','') + 'catalog.html?biz=' + business.id;
-                c.innerHTML = '<div class="card"><div class="card-header">Your QR Code</div><div class="qr-card"><div id="qrDisplay" style="display:inline-block;background:#fff;padding:20px;border-radius:12px;"></div><p style="margin-top:12px;font-size:11px;word-break:break-all;color:var(--muted);">' + qrUrl + '</p><div style="margin-top:16px;"><button class="btn btn-primary btn-sm" onclick="downloadQR()">⬇ Download PNG</button> <button class="btn btn-outline btn-sm" onclick="copyQRUrl()">📋 Copy Link</button></div></div></div>';
+                var qrUrl = location.origin + location.pathname.replace('portal.html','') + 'catalog.html?biz=' + business.id;                c.innerHTML = '<div class="card"><div class="card-header">Your QR Code</div><div class="qr-card"><div id="qrDisplay" style="display:inline-block;background:#fff;padding:20px;border-radius:12px;"></div><p style="margin-top:12px;font-size:11px;word-break:break-all;color:var(--muted);">' + qrUrl + '</p><div style="margin-top:16px;"><button class="btn btn-primary btn-sm" onclick="downloadQR()">⬇ Download PNG</button> <button class="btn btn-outline btn-sm" onclick="copyQRUrl()">📋 Copy Link</button></div></div></div>';
                 setTimeout(function() { var qc = document.getElementById('qrDisplay'); if(qc){qc.innerHTML='';new QRCode(qc,{text:qrUrl,width:220,height:220,colorDark:'#000',colorLight:'#fff'});} }, 200);
             }
 
