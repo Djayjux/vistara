@@ -317,8 +317,8 @@
 
         document.getElementById('itemModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
        if (token && business) { api('getProfile').then(function(r) { if (r.business) { business = r.business; localStorage.setItem('vbiz', JSON.stringify(business)); showApp(); } else handleLogout(); }); }
-
-        .loading-spinner {
+    </script>
+.loading-spinner {
     text-align: center; padding: 60px 20px;
 }
 .spinner {
@@ -327,6 +327,5 @@
     border-radius: 50%; animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-    </script>
 </body>
 </html>
