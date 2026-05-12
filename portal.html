@@ -241,7 +241,6 @@
             '<div class="card"><div class="card-header">📋 Your Public Catalog</div><div style="background:#f1f5f9;padding:14px;border-radius:8px;font-family:monospace;font-size:13px;word-break:break-all;color:var(--accent);">' + catalogUrl + '</div></div>' +
             (featured.length > 0 ? '<div class="card"><div class="card-header">⭐ Featured Items</div><div class="items-grid">' + featured.map(function(i) { return '<div class="item-card"><span class="featured-badge">⭐ Featured</span>' + (i.imageUrl ? '<img class="item-image" src="' + esc(i.imageUrl) + '" onerror="this.style.display=\'none\'">' : '<div class="item-emoji">📦</div>') + '<div class="item-body"><div class="item-category"><span class="badge badge-info">' + esc(i.category || 'General') + '</span></div><div class="item-name">' + esc(i.name) + '</div><div class="item-price">' + esc(i.price) + '</div></div></div>'; }).join('') + '</div></div>' : '');
     }
-}
             else if (page === 'items') {
                 var res = await api('getItemsEnhanced');
                 var items = res.items || [];
@@ -275,8 +274,6 @@
                     '<div class="form-group"><label class="form-label">Email</label><input class="form-input" id="settingsEmail" value="' + esc(business.email) + '"></div>' +
                     '<button class="btn btn-primary" onclick="saveSettings()">💾 Save Changes</button></div>';
             }
-        }
-
         function openAddItemModal() { document.getElementById('itemModalTitle').textContent = 'Add New Item'; document.getElementById('editItemId').value = ''; ['itemName','itemPrice','itemDesc','itemFeatures','itemImage','itemImage2','itemImage3','itemModel'].forEach(function(id) { document.getElementById(id).value = ''; }); document.getElementById('itemCategory').value = 'General'; document.getElementById('itemFeatured').checked = false; document.getElementById('itemModal').classList.add('open'); }
 
         async function editItem(id) {
