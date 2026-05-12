@@ -11,10 +11,16 @@
         :root { --bg: #f0f2f5; --surface: #ffffff; --border: #dde1e6; --text: #1a1d23; --muted: #6b7280; --accent: #2563eb; --accent-hover: #1d4ed8; --success: #059669; --danger: #dc2626; --warning: #d97706; --radius: 10px; --shadow: 0 1px 3px rgba(0,0,0,0.06); --shadow-md: 0 4px 12px rgba(0,0,0,0.08); }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; }
+        
         .auth-wrapper { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; background: linear-gradient(135deg, #f0f2f5 0%, #dde1e6 100%); }
         .auth-card { background: var(--surface); border-radius: 16px; padding: 40px; width: 460px; max-width: 95vw; box-shadow: var(--shadow-md); }
         .auth-logo { font-size: 28px; font-weight: 700; color: var(--accent); text-align: center; margin-bottom: 4px; }
         .auth-subtitle { color: var(--muted); font-size: 13px; text-align: center; margin-bottom: 28px; }
+        .password-wrap { position: relative; }
+        .password-wrap .form-input { padding-right: 44px; }
+        .toggle-password { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; color: var(--muted); padding: 4px; }
+        .toggle-password:hover { color: var(--text); }
+        
         .app-container { display: none; }
         .app-container.active { display: flex; }
         .sidebar { width: 250px; background: #1a1d23; min-height: 100vh; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; display: flex; flex-direction: column; }
@@ -82,6 +88,9 @@
         .badge-success { background: #ecfdf5; color: var(--success); }
         .badge-featured { background: #fffbeb; color: var(--warning); }
         .badge-info { background: #eff6ff; color: var(--accent); }
+        .spinner { display: inline-block; width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-wrap { text-align: center; padding: 60px 20px; }
         footer { text-align: center; padding: 20px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 40px; }
         footer a { color: var(--muted); text-decoration: none; }
         footer a:hover { color: var(--accent); }
@@ -95,8 +104,8 @@
             <div class="auth-logo">Vistara</div>
             <div class="auth-subtitle">3D Commerce Platform — Sign in to manage your catalog</div>
             <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" id="loginEmail" placeholder="you@company.com"></div>
-            <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="loginPassword" placeholder="Your password"></div>
-            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;" onclick="handleLogin()">🔐 Sign In</button>
+            <div class="form-group"><label class="form-label">Password</label><div class="password-wrap"><input class="form-input" type="password" id="loginPassword" placeholder="Your password"><button type="button" class="toggle-password" onclick="togglePass('loginPassword', this)">👁</button></div></div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;font-size:14px;" onclick="handleLogin()">🔐 Sign In</button>
             <p style="text-align:center;margin-top:18px;font-size:12px;color:var(--muted);">New to Vistara? <a href="#" onclick="showSignup()" style="color:var(--accent);font-weight:600;">Create account with license key</a></p>
         </div>
     </div>
@@ -109,8 +118,8 @@
             <div class="form-group"><label class="form-label">Business Name *</label><input class="form-input" id="signupName" placeholder="e.g., Al Maha Trading Co."></div>
             <div class="form-group"><label class="form-label">Business Logo URL</label><input class="form-input" id="signupLogo" placeholder="https://yourcompany.com/logo.png"><div class="form-hint">Upload your logo to Imgur and paste the link</div></div>
             <div class="form-group"><label class="form-label">Email Address *</label><input class="form-input" type="email" id="signupEmail" placeholder="you@company.com"></div>
-            <div class="form-group"><label class="form-label">Password * (min 8 characters)</label><input class="form-input" type="password" id="signupPassword" placeholder="Create a strong password"></div>
-            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;" onclick="handleSignup()">✨ Create Account</button>
+            <div class="form-group"><label class="form-label">Password * (min 8 characters)</label><div class="password-wrap"><input class="form-input" type="password" id="signupPassword" placeholder="Create a strong password"><button type="button" class="toggle-password" onclick="togglePass('signupPassword', this)">👁</button></div></div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;font-size:14px;" onclick="handleSignup()">✨ Create Account</button>
             <p style="text-align:center;margin-top:18px;"><a href="#" onclick="showLogin()" style="color:var(--accent);font-weight:600;">← Back to sign in</a></p>
         </div>
     </div>
@@ -167,8 +176,13 @@
         var token = localStorage.getItem('vtoken') || '';
         var business = JSON.parse(localStorage.getItem('vbiz') || 'null');
 
-        function getCatalogUrl() {
-            return BASE_URL + '/catalog.html?biz=' + (business ? business.id : '');
+        function getCatalogUrl() { return BASE_URL + '/catalog.html?biz=' + (business ? business.id : ''); }
+
+        // Show/hide password
+        function togglePass(id, btn) {
+            var input = document.getElementById(id);
+            if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
+            else { input.type = 'password'; btn.textContent = '👁'; }
         }
 
         async function api(action, payload) {
@@ -183,7 +197,7 @@
         async function handleLogin() {
             var email = document.getElementById('loginEmail').value.trim();
             var pass = document.getElementById('loginPassword').value;
-            if (!email || !pass) return showToast('Fill all fields', 'error');
+            if (!email || !pass) return showToast('Please fill all fields', 'error');
             var res = await api('businessLogin', { email: email, password: pass });
             if (res.success) { token = res.token; business = res.business; localStorage.setItem('vtoken', token); localStorage.setItem('vbiz', JSON.stringify(business)); showApp(); showToast('Welcome back!', 'success'); }
             else showToast(res.error || 'Login failed', 'error');
@@ -219,44 +233,34 @@
         }
 
         async function renderPage(page) {
-    document.getElementById('topbarTitle').textContent = page.charAt(0).toUpperCase() + page.slice(1);
-    var c = document.getElementById('contentArea');
-    c.innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p style="color:var(--muted);margin-top:12px;">Loading...</p></div>';
-    
-    var catalogUrl = getCatalogUrl();
+            document.getElementById('topbarTitle').textContent = page.charAt(0).toUpperCase() + page.slice(1);
+            var c = document.getElementById('contentArea');
+            c.innerHTML = '<div class="loading-wrap"><div class="spinner"></div><p style="color:var(--muted);margin-top:8px;">Loading...</p></div>';
+            var catalogUrl = getCatalogUrl();
 
-    if (page === 'dashboard') {
-        var itemsRes = await api('getItemsEnhanced');
-        var items = itemsRes.items || [];
-        var featured = items.filter(function(i) { return i.featured === 'Yes' || i.featured === true; });
-        var categories = {};
-        items.forEach(function(i) { var cat = i.category || 'General'; categories[cat] = (categories[cat] || 0) + 1; });
-        c.innerHTML = 
-            '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">' +
-                '<div class="card" style="text-align:center;"><div style="font-size:11px;color:var(--muted);">Total Items</div><div style="font-size:24px;font-weight:700;color:var(--accent);">' + items.length + '</div></div>' +
-                '<div class="card" style="text-align:center;"><div style="font-size:11px;color:var(--muted);">Categories</div><div style="font-size:24px;font-weight:700;">' + Object.keys(categories).length + '</div></div>' +
-                '<div class="card" style="text-align:center;"><div style="font-size:11px;color:var(--muted);">Featured</div><div style="font-size:24px;font-weight:700;color:var(--warning);">' + featured.length + '</div></div>' +
-                '<div class="card" style="text-align:center;"><div style="font-size:11px;color:var(--muted);">Plan</div><div style="font-size:18px;font-weight:700;">' + (business.plan || 'Starter') + '</div></div>' +
-            '</div>' +
-            '<div class="card"><div class="card-header">📋 Your Public Catalog</div><div style="background:#f1f5f9;padding:14px;border-radius:8px;font-family:monospace;font-size:13px;word-break:break-all;color:var(--accent);">' + catalogUrl + '</div></div>' +
-            (featured.length > 0 ? '<div class="card"><div class="card-header">⭐ Featured Items</div><div class="items-grid">' + featured.map(function(i) { return '<div class="item-card"><span class="featured-badge">⭐ Featured</span>' + (i.imageUrl ? '<img class="item-image" src="' + esc(i.imageUrl) + '" onerror="this.style.display=\'none\'">' : '<div class="item-emoji">📦</div>') + '<div class="item-body"><div class="item-category"><span class="badge badge-info">' + esc(i.category || 'General') + '</span></div><div class="item-name">' + esc(i.name) + '</div><div class="item-price">' + esc(i.price) + '</div></div></div>'; }).join('') + '</div></div>' : '');
-    }
+            if (page === 'dashboard') {
+                var itemsRes = await api('getItemsEnhanced'); var items = itemsRes.items || [];
+                var featured = items.filter(function(i) { return i.featured === 'Yes'; });
+                c.innerHTML = 
+                    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">' +
+                        '<div class="card" style="text-align:center;"><div style="font-size:11px;color:var(--muted);">Total Items</div><div style="font-size:24px;font-weight:700;color:var(--accent);">' + items.length + '</div></div>' +
+                        '<div class="card" style="text-align:center;"><div style="font-size:11px;color:var(--muted);">Featured</div><div style="font-size:24px;font-weight:700;">' + featured.length + '</div></div>' +
+                        '<div class="card" style="text-align:center;"><div style="font-size:11px;color:var(--muted);">Plan</div><div style="font-size:18px;font-weight:700;">' + (business.plan || 'Starter') + '</div></div>' +
+                        '<div class="card" style="text-align:center;"><div style="font-size:11px;color:var(--muted);">Catalog</div><div style="font-size:13px;color:var(--accent);">Active</div></div>' +
+                    '</div>' +
+                    '<div class="card"><div class="card-header">📋 Your Public Catalog URL</div><div style="background:#f1f5f9;padding:14px;border-radius:8px;font-family:monospace;font-size:13px;word-break:break-all;color:var(--accent);">' + catalogUrl + '</div><p style="font-size:11px;color:var(--muted);margin-top:8px;">Customers scan your QR code to view your products in 3D</p></div>';
+            }
             else if (page === 'items') {
-                var res = await api('getItemsEnhanced');
-                var items = res.items || [];
-                if (!items.length) { c.innerHTML = '<div class="card"><div class="card-header">My Items</div><div style="text-align:center;padding:48px;color:var(--muted);"><p style="font-size:48px;">📦</p><p style="font-weight:500;">No items yet</p><button class="btn btn-primary" style="margin-top:16px;" onclick="openAddItemModal()">+ Add Item</button></div></div>'; return; }
+                var res = await api('getItemsEnhanced'); var items = res.items || [];
+                if (!items.length) { c.innerHTML = '<div class="card"><div class="card-header">My Items</div><div style="text-align:center;padding:48px;color:var(--muted);"><p style="font-size:48px;">📦</p><p style="font-weight:500;">No items yet</p><button class="btn btn-primary" style="margin-top:16px;" onclick="openAddItemModal()">+ Add Your First Item</button></div></div>'; return; }
                 var html = '<div class="card"><div class="card-header">My Items (' + items.length + ')</div><div class="items-grid">';
-                items.forEach(function(i) {
-                    html += '<div class="item-card">' + (i.featured === 'Yes' ? '<span class="featured-badge">⭐</span>' : '') + (i.imageUrl ? '<img class="item-image" src="' + esc(i.imageUrl) + '" onerror="this.style.display=\'none\'">' : '<div class="item-emoji">📦</div>') + '<div class="item-body"><div class="item-category"><span class="badge badge-info">' + esc(i.category || 'General') + '</span></div><div class="item-name">' + esc(i.name) + '</div><div class="item-price">' + esc(i.price) + '</div>' + (i.features ? '<div class="item-features">' + i.features.split(',').slice(0,3).map(function(f) { return '<span class="item-tag">' + esc(f.trim()) + '</span>'; }).join('') + '</div>' : '') + '<div class="item-actions"><button class="btn btn-outline btn-sm" onclick="editItem(\'' + i.id + '\')">✎ Edit</button><button class="btn btn-danger btn-sm" onclick="deleteItem(\'' + i.id + '\')">✕</button></div></div></div>';
-                });
+                items.forEach(function(i) { html += '<div class="item-card">' + (i.featured === 'Yes' ? '<span class="featured-badge">⭐</span>' : '') + (i.imageUrl ? '<img class="item-image" src="' + esc(i.imageUrl) + '" loading="lazy" onerror="this.style.display=\'none\'">' : '<div class="item-emoji">📦</div>') + '<div class="item-body"><div class="item-category"><span class="badge badge-info">' + esc(i.category || 'General') + '</span></div><div class="item-name">' + esc(i.name) + '</div><div class="item-price">' + esc(i.price) + '</div>' + (i.features ? '<div class="item-features">' + i.features.split(',').slice(0,3).map(function(f) { return '<span class="item-tag">' + esc(f.trim()) + '</span>'; }).join('') + '</div>' : '') + '<div class="item-actions"><button class="btn btn-outline btn-sm" onclick="editItem(\'' + i.id + '\')">✎ Edit</button><button class="btn btn-danger btn-sm" onclick="deleteItem(\'' + i.id + '\')">✕</button></div></div></div>'; });
                 html += '</div></div>'; c.innerHTML = html;
             }
-
             else if (page === 'qrcode') {
-                c.innerHTML = '<div class="card"><div class="card-header">Your QR Code</div><div class="qr-card"><div id="qrDisplay" style="display:inline-block;background:#fff;padding:20px;border-radius:12px;"></div><p style="margin-top:12px;font-size:11px;word-break:break-all;color:var(--muted);">' + catalogUrl + '</p><div style="margin-top:16px;"><button class="btn btn-primary btn-sm" onclick="downloadQR()">⬇ Download PNG</button> <button class="btn btn-outline btn-sm" onclick="copyQRUrl()">📋 Copy Link</button></div></div></div>';
+                c.innerHTML = '<div class="card"><div class="card-header">🔗 Your QR Code</div><div class="qr-card"><div id="qrDisplay" style="display:inline-block;background:#fff;padding:20px;border-radius:12px;"></div><p style="margin-top:12px;font-size:11px;word-break:break-all;color:var(--muted);">' + catalogUrl + '</p><div style="margin-top:16px;"><button class="btn btn-primary btn-sm" onclick="downloadQR()">⬇ Download PNG</button> <button class="btn btn-outline btn-sm" onclick="copyQRUrl()">📋 Copy Link</button></div></div></div>';
                 setTimeout(function() { var qc = document.getElementById('qrDisplay'); if(qc){qc.innerHTML='';try{new QRCode(qc,{text:catalogUrl,width:220,height:220,colorDark:'#000000',colorLight:'#ffffff'});}catch(e){qc.innerHTML='<p style=color:red;>QR Error</p>';} } }, 300);
             }
-
             else if (page === 'profile') {
                 c.innerHTML = '<div class="card"><div class="card-header">🏢 Business Profile</div>' +
                     '<div class="form-group"><label class="form-label">Business Logo URL</label><input class="form-input" id="profileLogo" value="' + esc(business.logo || '') + '" placeholder="https://yourcompany.com/logo.png">' + (business.logo ? '<img src="' + esc(business.logo) + '" style="width:80px;height:80px;border-radius:8px;object-fit:cover;margin-top:8px;" onerror="this.style.display=\'none\'">' : '') + '</div>' +
@@ -267,56 +271,31 @@
                     '<div class="form-group"><label class="form-label">WhatsApp Number</label><input class="form-input" id="profileWhatsapp" value="' + esc(business.whatsapp || '') + '" placeholder="+971501234567"></div>' +
                     '<button class="btn btn-primary" onclick="saveProfile()">💾 Save Profile</button></div>';
             }
-
             else if (page === 'settings') {
                 c.innerHTML = '<div class="card"><div class="card-header">⚙️ Account Settings</div>' +
                     '<div class="form-group"><label class="form-label">Business Name</label><input class="form-input" id="settingsName" value="' + esc(business.name) + '"></div>' +
                     '<div class="form-group"><label class="form-label">Email</label><input class="form-input" id="settingsEmail" value="' + esc(business.email) + '"></div>' +
                     '<button class="btn btn-primary" onclick="saveSettings()">💾 Save Changes</button></div>';
             }
+        }
+
         function openAddItemModal() { document.getElementById('itemModalTitle').textContent = 'Add New Item'; document.getElementById('editItemId').value = ''; ['itemName','itemPrice','itemDesc','itemFeatures','itemImage','itemImage2','itemImage3','itemModel'].forEach(function(id) { document.getElementById(id).value = ''; }); document.getElementById('itemCategory').value = 'General'; document.getElementById('itemFeatured').checked = false; document.getElementById('itemModal').classList.add('open'); }
 
-        async function editItem(id) {
-            var res = await api('getItemsEnhanced'); var items = res.items || []; var item = items.find(function(i) { return i.id === id; });
-            if (!item) return showToast('Item not found', 'error');
-            document.getElementById('itemModalTitle').textContent = 'Edit Item'; document.getElementById('editItemId').value = item.id;
-            document.getElementById('itemName').value = item.name || ''; document.getElementById('itemCategory').value = item.category || 'General';
-            document.getElementById('itemPrice').value = item.price || ''; document.getElementById('itemDesc').value = item.description || '';
-            document.getElementById('itemFeatures').value = item.features || ''; document.getElementById('itemImage').value = item.imageUrl || '';
-            document.getElementById('itemImage2').value = item.imageUrl2 || ''; document.getElementById('itemImage3').value = item.imageUrl3 || '';
-            document.getElementById('itemModel').value = item.modelUrl || ''; document.getElementById('itemFeatured').checked = (item.featured === 'Yes' || item.featured === true);
-            document.getElementById('itemModal').classList.add('open');
-        }
+        async function editItem(id) { var res = await api('getItemsEnhanced'); var item = (res.items || []).find(function(i) { return i.id === id; }); if (!item) return showToast('Item not found', 'error'); document.getElementById('itemModalTitle').textContent = 'Edit Item'; document.getElementById('editItemId').value = item.id; document.getElementById('itemName').value = item.name || ''; document.getElementById('itemCategory').value = item.category || 'General'; document.getElementById('itemPrice').value = item.price || ''; document.getElementById('itemDesc').value = item.description || ''; document.getElementById('itemFeatures').value = item.features || ''; document.getElementById('itemImage').value = item.imageUrl || ''; document.getElementById('itemImage2').value = item.imageUrl2 || ''; document.getElementById('itemImage3').value = item.imageUrl3 || ''; document.getElementById('itemModel').value = item.modelUrl || ''; document.getElementById('itemFeatured').checked = (item.featured === 'Yes'); document.getElementById('itemModal').classList.add('open'); }
 
-        async function saveItem() {
-            var name = document.getElementById('itemName').value.trim(); var price = document.getElementById('itemPrice').value.trim();
-            if (!name || !price) return showToast('Name and price required', 'error');
-            var editId = document.getElementById('editItemId').value;
-            var payload = { name: name, price: price, description: document.getElementById('itemDesc').value.trim(), category: document.getElementById('itemCategory').value, features: document.getElementById('itemFeatures').value.trim(), imageUrl: document.getElementById('itemImage').value.trim(), imageUrl2: document.getElementById('itemImage2').value.trim(), imageUrl3: document.getElementById('itemImage3').value.trim(), modelUrl: document.getElementById('itemModel').value.trim(), featured: document.getElementById('itemFeatured').checked };
-            if (editId) payload.itemId = editId;
-            var res = await api('addItemEnhanced', payload);
-            if (res.success) { closeModal(); renderPage('items'); showToast(editId ? 'Item updated!' : 'Item added!', 'success'); }
-            else showToast(res.error || 'Failed', 'error');
-        }
+        async function saveItem() { var name = document.getElementById('itemName').value.trim(); var price = document.getElementById('itemPrice').value.trim(); if (!name || !price) return showToast('Name and price required', 'error'); var editId = document.getElementById('editItemId').value; var payload = { name: name, price: price, description: document.getElementById('itemDesc').value.trim(), category: document.getElementById('itemCategory').value, features: document.getElementById('itemFeatures').value.trim(), imageUrl: document.getElementById('itemImage').value.trim(), imageUrl2: document.getElementById('itemImage2').value.trim(), imageUrl3: document.getElementById('itemImage3').value.trim(), modelUrl: document.getElementById('itemModel').value.trim(), featured: document.getElementById('itemFeatured').checked }; if (editId) payload.itemId = editId; var res = await api('addItemEnhanced', payload); if (res.success) { closeModal(); renderPage('items'); showToast(editId ? 'Item updated!' : 'Item added!', 'success'); } else showToast(res.error || 'Failed', 'error'); }
 
         async function deleteItem(id) { if (!confirm('Delete this item?')) return; await api('deleteItem', { itemId: id }); renderPage('items'); showToast('Item deleted'); }
-
-        async function saveProfile() {
-            var payload = { logo: document.getElementById('profileLogo').value.trim(), description: document.getElementById('profileDesc').value.trim(), phone: document.getElementById('profilePhone').value.trim(), website: document.getElementById('profileWebsite').value.trim(), instagram: document.getElementById('profileInstagram').value.trim(), whatsapp: document.getElementById('profileWhatsapp').value.trim() };
-            var res = await api('updateBusinessProfile', payload);
-            if (res.success) { Object.keys(payload).forEach(function(k) { if (payload[k]) business[k] = payload[k]; }); localStorage.setItem('vbiz', JSON.stringify(business)); if (payload.logo) document.getElementById('sidebarLogo').src = payload.logo; showToast('Profile saved!', 'success'); }
-            else showToast(res.error || 'Failed', 'error');
-        }
-
-        async function saveSettings() { var name = document.getElementById('settingsName').value.trim(); var email = document.getElementById('settingsEmail').value.trim(); if (!name) return showToast('Name required', 'error'); await api('updateSettings', { name: name, email: email }); business.name = name; if (email) business.email = email; localStorage.setItem('vbiz', JSON.stringify(business)); document.getElementById('sidebarBizName').textContent = name; showToast('Settings saved', 'success'); }
-        function downloadQR() { var c = document.querySelector('#qrDisplay canvas'); if (c) { var a = document.createElement('a'); a.download = 'vistara-qr.png'; a.href = c.toDataURL(); a.click(); } else { showToast('QR not loaded yet', 'error'); } }
+        async function saveProfile() { var payload = { logo: document.getElementById('profileLogo').value.trim(), description: document.getElementById('profileDesc').value.trim(), phone: document.getElementById('profilePhone').value.trim(), website: document.getElementById('profileWebsite').value.trim(), instagram: document.getElementById('profileInstagram').value.trim(), whatsapp: document.getElementById('profileWhatsapp').value.trim() }; var res = await api('updateBusinessProfile', payload); if (res.success) { Object.keys(payload).forEach(function(k) { if (payload[k]) business[k] = payload[k]; }); localStorage.setItem('vbiz', JSON.stringify(business)); showToast('Profile saved!', 'success'); } else showToast(res.error || 'Failed', 'error'); }
+        async function saveSettings() { var name = document.getElementById('settingsName').value.trim(); if (!name) return showToast('Name required', 'error'); await api('updateSettings', { name: name }); business.name = name; localStorage.setItem('vbiz', JSON.stringify(business)); document.getElementById('sidebarBizName').textContent = name; showToast('Settings saved!', 'success'); }
+        function downloadQR() { var c = document.querySelector('#qrDisplay canvas'); if (c) { var a = document.createElement('a'); a.download = 'vistara-qr.png'; a.href = c.toDataURL(); a.click(); } }
         function copyQRUrl() { navigator.clipboard?.writeText(getCatalogUrl()).then(function() { showToast('Link copied!', 'success'); }); }
         function closeModal() { document.getElementById('itemModal').classList.remove('open'); }
         function esc(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
         function showToast(m, t) { var o = document.getElementById('toast'); o.textContent = m; o.className = 'toast ' + (t||'') + ' show'; clearTimeout(o._t); o._t = setTimeout(function() { o.classList.remove('show'); }, 3000); }
 
         document.getElementById('itemModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
-       if (token && business) { api('getProfile').then(function(r) { if (r.business) { business = r.business; localStorage.setItem('vbiz', JSON.stringify(business)); showApp(); } else handleLogout(); }); }
+        if (token && business) { api('getProfile').then(function(r) { if (r.business) { business = r.business; localStorage.setItem('vbiz', JSON.stringify(business)); showApp(); } else handleLogout(); }); }
     </script>
 </body>
 </html>
