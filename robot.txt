@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /index.html
+Allow: /portal.html
 Allow: /catalog.html
+Allow: /terms.html
+Allow: /privacy.html
 Disallow: /admin.html
