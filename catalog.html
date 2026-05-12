@@ -183,7 +183,7 @@
             document.getElementById('detailModal').classList.add('open'); 
             document.body.style.overflow = 'hidden';
         };
-        window.submitInquiry = function(itemName) {
+window.submitInquiry = function(itemName) {
     var n = document.getElementById('inqName').value.trim();
     var p = document.getElementById('inqPhone').value.trim();
     var m = document.getElementById('inqMessage').value.trim();
@@ -200,7 +200,8 @@
             } else {
                 alert(res.error || 'Failed to send. Please try again.');
             }
-        });        
+        });
+};
 
         window.closeDetail = function() { document.getElementById('detailModal').classList.remove('open'); document.body.style.overflow = ''; };
         document.getElementById('detailModal').addEventListener('click', function(e) { if (e.target === this) closeDetail(); });
