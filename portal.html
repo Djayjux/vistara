@@ -384,5 +384,8 @@
         document.getElementById('itemModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
         if (token && business) { api('getProfile').then(function(r) { if (r.business) { business = r.business; localStorage.setItem('vbiz', JSON.stringify(business)); showApp(); } else handleLogout(); }); }
     </script>
+<footer style="text-align:center;padding:20px;font-size:11px;color:var(--muted);border-top:1px solid var(--border);margin-top:40px;">
+    © 2025 Vistara · <a href="terms.html" style="color:var(--muted);">Terms</a> · <a href="privacy.html" style="color:var(--muted);">Privacy</a>
+</footer>
 </body>
 </html>
