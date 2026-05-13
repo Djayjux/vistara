@@ -123,13 +123,14 @@ function renderCatalog(data) {
 if (data.businessName === 'Not Found') {
     c.innerHTML = '<div class="empty-state"><h3>Business Not Found</h3><p>Check the business ID.</p></div>'; 
     return;
-}    }
+}    
     businessData = data;
     catalogItems = data.items || [];
     if (!catalogItems.length) { 
         c.innerHTML = buildHeader(data) + '<div class="empty-state"><p>No products yet.</p></div>'; 
         return; 
     }
+    
     var cats = ['All'];
     catalogItems.forEach(function(i) { 
         var cat = i.category || 'General'; 
