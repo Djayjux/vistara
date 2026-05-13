@@ -116,10 +116,14 @@ function loadCatalog() {
 
 function renderCatalog(data) {
     var c = document.getElementById('catalogContent');
-    if (!data || data.businessName === 'Not Found' || !data.items) { 
-        c.innerHTML = '<div class="empty-state"><h3>Business Not Found</h3><p>Check the business ID.</p></div>'; 
-        return; 
-    }
+    if (!data || !data.items || data.items.length === 0) { 
+    c.innerHTML = '<div class="empty-state"><h3>No Products Found</h3><p>This business has no items yet.</p></div>'; 
+    return; 
+}
+if (data.businessName === 'Not Found') {
+    c.innerHTML = '<div class="empty-state"><h3>Business Not Found</h3><p>Check the business ID.</p></div>'; 
+    return;
+}    }
     businessData = data;
     catalogItems = data.items || [];
     if (!catalogItems.length) { 
@@ -162,8 +166,8 @@ function renderProducts() {
         return '<div class="product-card" onclick="showDetail(' + idx + ')">' +
             (item.featured === 'Yes' ? '<span class="featured-badge">⭐</span>' : '') +
             (item.imageUrl ? '<img class="product-image" src="' + esc(item.imageUrl) + '" loading="lazy" alt="' + esc(item.name) + '" onerror="this.parentElement.innerHTML=\'<div class=product-emoji>📦</div>\'">' : '<div class="product-emoji">📦</div>') +
-            '<div class="product-body"><div class="product-category">' + esc(item.category || 'General') + '</div><div class="product-name">' + esc(item.name) + '</div><div class="product-price">' + esc(item.price) + '</div>' +
-            '</div></div>';
+            '<div class="product-body"><div class="product-category">' + esc((item.category && item.category.length < 20 ? item.category : 'General')) + '</div><div class="product-name">' + esc(item.name) + '</div><div class="product-price">' + esc(item.price) + '</div>' +
+            '</div></div>'
     }).join('');
 }
 
