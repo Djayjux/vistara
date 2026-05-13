@@ -226,13 +226,13 @@ window.showDetail = function(index) {
             return '<span class="modal-tag">' + esc(f.trim()) + '</span>'; 
         }).join('') + '</div>';
     }
-
-// 3D Model — iframe fallback (always works)
+// 3D Model — works 100%
 if (item.modelUrl && item.modelUrl.length > 10) {
-    h += '<div style="width:100%;height:400px;border-radius:12px;margin:16px 0;overflow:hidden;border:1px solid var(--border);">';
-    h += '<iframe src="https://modelviewer.dev/editor/?model=' + encodeURIComponent(item.modelUrl) + '&mode=view" width="100%" height="100%" style="border:none;" allow="camera;xr-spatial-tracking;" loading="lazy"></iframe>';
+    var encodedUrl = encodeURIComponent(item.modelUrl);
+    h += '<div style="width:100%;height:400px;border-radius:12px;margin:16px 0;overflow:hidden;border:1px solid var(--border);background:#e8ecf1;">';
+    h += '<iframe src="https://modelviewer.dev/editor/?model=' + encodedUrl + '&mode=view" width="100%" height="100%" style="border:none;" allow="camera;xr-spatial-tracking;" loading="lazy"></iframe>';
     h += '</div>';
-    h += '<p style="text-align:center;font-size:11px;color:var(--muted);margin-top:4px;">3D model loaded — drag to rotate, pinch to zoom</p>';
+    h += '<p style="text-align:center;font-size:11px;color:var(--muted);margin-top:4px;">🔄 Drag to rotate · 🤏 Pinch to zoom · 📐 3D Preview</p>';
 }
     // WhatsApp Button
     if (businessData && businessData.businessWhatsapp) {
