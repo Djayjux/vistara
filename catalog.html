@@ -136,7 +136,6 @@ function renderCatalog(data) {
     }
     
    businessData = data;
-
 // Normalize: handle items nested under different keys or root array
 var items = data.items || data.products || data.data || (Array.isArray(data) ? data : null);
 
@@ -144,9 +143,6 @@ if (!items || items.length === 0) {
     c.innerHTML = buildHeader(data) + '<div class="empty-state"><p>No products yet.</p></div>'; 
     return; 
 }
-
-catalogItems = items;    
-    catalogItems = data.items;
     
     // Build catalog
     var cats = ['All'];
