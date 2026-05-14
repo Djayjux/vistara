@@ -153,32 +153,6 @@ function renderCatalog(data) {
     
     renderProducts();
 }    
-if (data.businessName === 'Not Found') {
-    c.innerHTML = '<div class="empty-state"><h3>Business Not Found</h3><p>Check the business ID.</p></div>'; 
-    return;
-}    
-    businessData = data;
-    catalogItems = data.items || [];
-    if (!catalogItems.length) { 
-        c.innerHTML = buildHeader(data) + '<div class="empty-state"><p>No products yet.</p></div>'; 
-        return; 
-    }
-    
-    var cats = ['All'];
-    catalogItems.forEach(function(i) { 
-        var cat = i.category || 'General'; 
-        if (cat === 'General' || cat.length < 3) { cat = 'General'; }
-        if (cats.indexOf(cat) === -1) cats.push(cat); 
-    });
-    c.innerHTML = buildHeader(data) + 
-        '<div class="search-bar"><input class="search-input" id="searchInput" placeholder="🔍 Search products..." onkeyup="filterItems()"></div>' +
-        '<div class="categories">' + cats.map(function(cat) { 
-            return '<button class="cat-btn' + (cat === 'All' ? ' active' : '') + '" onclick="filterByCategory(\'' + cat + '\', this)">' + cat + '</button>'; 
-        }).join('') + '</div>' +
-        '<div id="productsGrid"></div>' +
-        '<div class="footer-note">Powered by <strong>Vistara</strong></div>';
-    renderProducts();
-}
 
 function buildHeader(data) {
     var h = '<div class="biz-header">';
