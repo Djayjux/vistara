@@ -116,10 +116,44 @@ function loadCatalog() {
 
 function renderCatalog(data) {
     var c = document.getElementById('catalogContent');
-    if (!data || !data.items || data.items.length === 0) { 
-    c.innerHTML = '<div class="empty-state"><h3>No Products Found</h3><p>This business has no items yet.</p></div>'; 
-    return; 
-}
+    
+    // Always show the data we got
+    if (!data) { 
+        c.innerHTML = '<div class="empty-state"><h3>Error</h3><p>No data received.</p></div>'; 
+        return; 
+    }
+    
+    if (data.businessName === 'Not Found') {
+        c.innerHTML = '<div class="empty-state"><h3>Business Not Found</h3></div>'; 
+        return;
+    }
+    
+    businessData = data;
+    catalogItems = data.items || [];
+    
+    if (catalogItems.length === 0) { 
+        c.innerHTML = buildHeader(data) + '<div class="empty-state"><p>No products yet.</p></div>'; 
+        return; 
+    }
+    
+    // Build catalog
+    var cats = ['All'];
+    catalogItems.forEach(function(i) { 
+        var cat = i.category || 'General'; 
+        if (cat.length > 20) cat = 'General';
+        if (cats.indexOf(cat) === -1) cats.push(cat); 
+    });
+    
+    c.innerHTML = buildHeader(data) + 
+        '<div class="search-bar"><input class="search-input" id="searchInput" placeholder="🔍 Search products..." onkeyup="filterItems()"></div>' +
+        '<div class="categories">' + cats.map(function(cat) { 
+            return '<button class="cat-btn' + (cat === 'All' ? ' active' : '') + '" onclick="filterByCategory(\'' + cat + '\', this)">' + cat + '</button>'; 
+        }).join('') + '</div>' +
+        '<div id="productsGrid"></div>' +
+        '<div class="footer-note">Powered by <strong>Vistara</strong></div>';
+    
+    renderProducts();
+}    
 if (data.businessName === 'Not Found') {
     c.innerHTML = '<div class="empty-state"><h3>Business Not Found</h3><p>Check the business ID.</p></div>'; 
     return;
