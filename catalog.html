@@ -3,73 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>Vistara 3D Catalog</title>
+<title>Vistara Catalog</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔷</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script type="module" src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
 <style>
-:root{--bg:#f8f9fb;--surface:#fff;--border:#e2e6ed;--text:#1a1d23;--muted:#6b7280;--accent:#2563eb;--success:#059669;--radius:12px;--shadow:0 1px 3px rgba(0,0,0,0.06);}
+:root{--bg:#f8f9fb;--surface:#fff;--border:#e2e6ed;--text:#1a1d23;--muted:#6b7280;--accent:#2563eb;}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 .container{max-width:680px;margin:0 auto;padding:20px 16px 60px;}
-.biz-header{text-align:center;padding:24px 0 8px;}
+.biz-header{text-align:center;padding:24px 0;}
 .biz-logo{width:80px;height:80px;border-radius:16px;object-fit:cover;margin-bottom:12px;}
 .biz-name{font-size:26px;font-weight:700;}
-.biz-desc{color:var(--muted);font-size:13px;margin-top:4px;}
-.biz-contact{display:flex;justify-content:center;gap:8px;margin-top:12px;flex-wrap:wrap;}
-.contact-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:500;text-decoration:none;}
-.contact-btn.call{background:#eff6ff;color:var(--accent);}
-.contact-btn.whatsapp{background:#e8f5e9;color:#1b5e20;}
-.contact-btn.web{background:#f5f5f5;color:var(--text);}
-.contact-btn.instagram{background:#fce4ec;color:#c62828;}
-.search-bar{margin:16px 0;}
-.search-input{width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:25px;font-size:14px;outline:none;background:var(--surface);box-shadow:var(--shadow);}
-.search-input:focus{border-color:var(--accent);}
-.categories{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
-.cat-btn{padding:6px 14px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:'Inter',sans-serif;}
-.cat-btn:hover,.cat-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
-.product-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow);cursor:pointer;position:relative;transition:all 0.15s;}
-.product-card:hover{border-color:var(--accent);box-shadow:0 4px 12px rgba(0,0,0,0.1);transform:translateY(-2px);}
-.featured-badge{position:absolute;top:12px;left:12px;background:#f59e0b;color:#fff;font-size:10px;padding:4px 10px;border-radius:12px;font-weight:600;z-index:2;}
+.product-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.06);cursor:pointer;}
 .product-image{width:100%;height:220px;object-fit:cover;display:block;}
 .product-emoji{width:100%;height:220px;display:flex;align-items:center;justify-content:center;font-size:64px;background:#f1f5f9;}
 .product-body{padding:16px;}
-.product-category{font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:4px;}
-.product-name{font-size:18px;font-weight:600;margin-bottom:4px;}
-.product-price{font-size:22px;font-weight:700;color:var(--accent);margin-bottom:8px;}
-.product-desc{color:var(--muted);font-size:13px;margin-bottom:8px;}
-.product-tags{display:flex;flex-wrap:wrap;gap:4px;}
-.product-tag{font-size:10px;padding:3px 8px;border-radius:10px;background:#eff6ff;color:var(--accent);font-weight:500;}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;}
+.product-category{font-size:10px;color:var(--accent);text-transform:uppercase;font-weight:600;}
+.product-name{font-size:18px;font-weight:600;margin:4px 0;}
+.product-price{font-size:22px;font-weight:700;color:var(--accent);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;}
 .modal-overlay.open{display:flex;}
-.modal-card{background:var(--surface);border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,0.25);}
+.modal-card{background:var(--surface);border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;}
 .modal-close-btn{position:sticky;top:0;float:right;background:rgba(0,0,0,0.5);color:#fff;border:none;font-size:22px;cursor:pointer;padding:10px 16px;border-radius:0 16px 0 12px;z-index:10;}
 .modal-image{width:100%;max-height:300px;object-fit:cover;display:block;}
 .modal-emoji{font-size:80px;text-align:center;padding:40px 0;background:#f1f5f9;}
 .modal-content{padding:20px;}
 .modal-name{font-size:22px;font-weight:700;}
 .modal-price{font-size:28px;font-weight:700;color:var(--accent);margin:6px 0 12px;}
-.modal-desc{color:var(--text);font-size:14px;margin-bottom:12px;}
-.modal-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
-.modal-tag{font-size:10px;padding:4px 10px;border-radius:12px;background:#eff6ff;color:var(--accent);}
-.modal-gallery{display:flex;gap:8px;overflow-x:auto;margin-bottom:16px;padding-bottom:8px;}
-.modal-gallery img{width:80px;height:80px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent;flex-shrink:0;}
-.modal-gallery img:hover{border-color:var(--accent);}
-.viewer-container{width:100%;height:420px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:linear-gradient(to bottom,#eef2f7,#dfe6ee);margin:16px 0;}
+.viewer-container{width:100%;height:420px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#eef2f7;margin:16px 0;}
 model-viewer{width:100%;height:100%;display:block;}
-.ar-button{background:#2563eb;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;}
-.inquiry-form{background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-top:20px;}
-.inq-input,.inq-textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;margin-bottom:8px;outline:none;}
-.inq-textarea{height:70px;resize:vertical;}
-.inq-submit{width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
-.inq-success{text-align:center;padding:20px;color:var(--success);font-weight:600;}
 .empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
 .spinner{display:inline-block;width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .footer-note{text-align:center;padding:24px 0 0;font-size:11px;color:var(--muted);}
+.contact-btn{display:inline-block;padding:14px 28px;border-radius:8px;font-weight:600;font-size:14px;text-decoration:none;text-align:center;width:100%;}
+.contact-btn.whatsapp{background:#25D366;color:#fff;}
+.contact-btn.call{background:var(--accent);color:#fff;}
 </style>
 </head>
 <body>
@@ -84,159 +54,104 @@ model-viewer{width:100%;height:100%;display:block;}
 
 <script>
 var API_URL = 'https://script.google.com/macros/s/AKfycbzMmMowHeSILF0plle8IQKyNj1qgebCrLqtODuHyaEkJSZUd2YnVjekQiXHBNjafNjc/exec';
-var params = new URLSearchParams(location.search);
-var bizId = params.get('biz');
+var bizId = new URLSearchParams(location.search).get('biz');
 var catalogItems = [];
 var businessData = null;
-var currentFilter = 'All';
 
-console.log('Catalog loaded. BizID:', bizId);
-
-if (!bizId) { 
-    document.getElementById('catalogContent').innerHTML = '<div class="empty-state"><h3>No business specified</h3><p>Please scan a valid QR code.</p></div>'; 
-} else { 
-    loadCatalog(); 
+if (!bizId) {
+    document.getElementById('catalogContent').innerHTML = '<div class="empty-state"><h3>No business specified</h3></div>';
+} else {
+    loadCatalog();
 }
 
 function loadCatalog() {
-    var body = new URLSearchParams();
-    body.append('data', JSON.stringify({ action: 'publicGetCatalog', payload: { businessId: bizId } }));
-    console.log('Sending request for bizId:', bizId);
-    fetch(API_URL, { method: 'POST', body: body })
-        .then(function(r) { 
-            console.log('HTTP status:', r.status);
-            return r.text();  // <-- get raw text first, not JSON
-        })
-        .then(function(text) { 
-            console.log('Raw response:', text);  // <-- see exactly what came back
-            try {
-                var d = JSON.parse(text);
-                console.log('Parsed keys:', Object.keys(d));
-                renderCatalog(d);
-            } catch(e) {
-                console.error('JSON parse failed:', e);
-                document.getElementById('catalogContent').innerHTML = '<div class="empty-state"><pre style="font-size:10px;text-align:left;overflow:auto">' + text.substring(0, 500) + '</pre></div>';
+    fetch(API_URL + '?biz=' + bizId)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (!data || !data.items || data.items.length === 0) {
+                document.getElementById('catalogContent').innerHTML = 
+                    '<div class="biz-header"><h1 class="biz-name">' + (data ? data.businessName : 'Catalog') + '</h1></div>' +
+                    '<div class="empty-state"><p>No products yet.</p></div>';
+                return;
             }
+            businessData = data;
+            catalogItems = data.items;
+            showCatalog();
         })
-        .catch(function(e) { 
-            console.error('Fetch error:', e);
-            document.getElementById('catalogContent').innerHTML = '<div class="empty-state"><p>Network error: ' + e.message + '</p></div>';
+        .catch(function() {
+            document.getElementById('catalogContent').innerHTML = '<div class="empty-state"><p>Error loading.</p></div>';
         });
-}    
-function renderCatalog(data) {
-    var c = document.getElementById('catalogContent');
-    
-    console.log('renderCatalog received:', JSON.stringify(data));
-    console.log('Items array:', data.items);
-    console.log('Items length:', data.items ? data.items.length : 'no items property');
-    
-    if (!data) { 
-        c.innerHTML = '<div class="empty-state"><h3>Error</h3><p>No data received.</p></div>'; 
-        return; 
-    }
-    
-   businessData = data;
-// Normalize: handle items nested under different keys or root array
-var items = data.items || data.products || data.data || (Array.isArray(data) ? data : null);
-
-if (!items || items.length === 0) { 
-    c.innerHTML = buildHeader(data) + '<div class="empty-state"><p>No products yet.</p></div>'; 
-    return; 
 }
+
+function showCatalog() {
+    var h = '<div class="biz-header">';
+    if (businessData.businessLogo) h += '<img class="biz-logo" src="' + businessData.businessLogo + '">';
+    h += '<h1 class="biz-name">' + businessData.businessName + '</h1>';
+    h += '</div>';
     
-    // Build catalog
-    var cats = ['All'];
-    catalogItems.forEach(function(i) { 
-        var cat = i.category || 'General'; 
-        if (cat.length > 20) cat = 'General';
-        if (cats.indexOf(cat) === -1) cats.push(cat); 
+    catalogItems.forEach(function(item, idx) {
+        h += '<div class="product-card" onclick="showDetail(' + idx + ')">';
+        if (item.imageUrl) {
+            h += '<img class="product-image" src="' + item.imageUrl + '" onerror="this.style.display=\'none\'">';
+        } else {
+            h += '<div class="product-emoji">📦</div>';
+        }
+        h += '<div class="product-body">';
+        h += '<div class="product-category">' + (item.category || 'General') + '</div>';
+        h += '<div class="product-name">' + item.name + '</div>';
+        h += '<div class="product-price">' + item.price + '</div>';
+        h += '</div></div>';
     });
     
-    c.innerHTML = buildHeader(data) + 
-        '<div class="search-bar"><input class="search-input" id="searchInput" placeholder="🔍 Search products..." onkeyup="filterItems()"></div>' +
-        '<div class="categories">' + cats.map(function(cat) { 
-            return '<button class="cat-btn' + (cat === 'All' ? ' active' : '') + '" onclick="filterByCategory(\'' + cat + '\', this)">' + cat + '</button>'; 
-        }).join('') + '</div>' +
-        '<div id="productsGrid"></div>' +
-        '<div class="footer-note">Powered by <strong>Vistara</strong></div>';
-    
-    renderProducts();
+    h += '<div class="footer-note">Powered by <strong>Vistara</strong></div>';
+    document.getElementById('catalogContent').innerHTML = h;
 }
-
-function buildHeader(data) {
-    var h = '<div class="biz-header">';
-    if (data.businessLogo) h += '<img class="biz-logo" src="' + esc(data.businessLogo) + '" alt="Logo" onerror="this.style.display=\'none\'">';
-    h += '<h1 class="biz-name">' + esc(data.businessName) + '</h1>';
-    if (data.businessDescription) h += '<p class="biz-desc">' + esc(data.businessDescription) + '</p>';
-    var btns = [];
-    if (data.businessPhone) btns.push('<a class="contact-btn call" href="tel:' + esc(data.businessPhone) + '">📞 Call</a>');
-    if (data.businessWhatsapp) btns.push('<a class="contact-btn whatsapp" href="https://wa.me/' + esc((data.businessWhatsapp || '').replace(/[^0-9]/g,'')) + '" target="_blank">💬 WhatsApp</a>');
-    if (btns.length) h += '<div class="biz-contact">' + btns.join('') + '</div>';
-    return h + '</div>';
-}
-
-function renderProducts() {
-    var filtered = catalogItems;
-    var g = document.getElementById('productsGrid');
-    if (!filtered.length) { g.innerHTML = '<div class="empty-state"><p>No products match.</p></div>'; return; }
-    g.innerHTML = filtered.map(function(item, idx) {
-        return '<div class="product-card" onclick="showDetail(' + idx + ')">' +
-            (item.featured === 'Yes' ? '<span class="featured-badge">⭐</span>' : '') +
-            (item.imageUrl ? '<img class="product-image" src="' + esc(item.imageUrl) + '" loading="lazy" alt="' + esc(item.name) + '" onerror="this.parentElement.innerHTML=\'<div class=product-emoji>📦</div>\'">' : '<div class="product-emoji">📦</div>') +
-            '<div class="product-body"><div class="product-category">' + esc((item.category && item.category.length < 20 ? item.category : 'General')) + '</div><div class="product-name">' + esc(item.name) + '</div><div class="product-price">' + esc(item.price) + '</div>' +
-            '</div></div>'
-    }).join('');
-}
-
-window.filterByCategory = function(cat, btn) { currentFilter = cat; document.querySelectorAll('.cat-btn').forEach(function(b) { b.classList.remove('active'); }); if (btn) btn.classList.add('active'); renderProducts(); };
-window.filterItems = function() { renderProducts(); };
 
 window.showDetail = function(index) {
-    var item = catalogItems[index]; if (!item) return;
-    var card = document.getElementById('detailCard');
+    var item = catalogItems[index];
+    if (!item) return;
+    
     var h = '<button class="modal-close-btn" onclick="closeDetail()">✕</button>';
     
-    if (item.imageUrl) { 
-        h += '<img class="modal-image" src="' + esc(item.imageUrl) + '" alt="' + esc(item.name) + '" onerror="this.style.display=\'none\'">'; 
-    } else { h += '<div class="modal-emoji">📦</div>'; }
+    if (item.imageUrl) {
+        h += '<img class="modal-image" src="' + item.imageUrl + '" onerror="this.style.display=\'none\'">';
+    } else {
+        h += '<div class="modal-emoji">📦</div>';
+    }
     
     h += '<div class="modal-content">';
-    h += '<div class="modal-name">' + esc(item.name) + '</div>';
-    h += '<div class="modal-price">' + esc(item.price) + '</div>';
-    if (item.description) h += '<div class="modal-desc">' + esc(item.description) + '</div>';
-
-    console.log('Item modelUrl:', item.modelUrl);
-
-    // 3D Viewer
+    h += '<div class="modal-name">' + item.name + '</div>';
+    h += '<div class="modal-price">' + item.price + '</div>';
+    
     if (item.modelUrl && item.modelUrl.length > 10) {
-        console.log('Loading 3D model:', item.modelUrl);
         h += '<div class="viewer-container">';
-        h += '<model-viewer src="' + esc(item.modelUrl) + '" alt="' + esc(item.name) + '" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="20deg" ar shadow-intensity="1" exposure="1" environment-image="neutral" tone-mapping="commerce" interaction-prompt="auto" style="width:100%;height:100%;">';
-        h += '<button slot="ar-button" class="ar-button">📱 View In Your Space</button>';
+        h += '<model-viewer src="' + item.modelUrl + '" camera-controls auto-rotate ar style="width:100%;height:100%;">';
         h += '</model-viewer>';
         h += '</div>';
-        h += '<p style="text-align:center;font-size:11px;color:var(--muted);margin-top:8px;">🔄 Drag to rotate · 🤏 Pinch to zoom · 📱 AR Supported</p>';
-    } else {
-        h += '<p style="text-align:center;color:var(--muted);padding:20px;">No 3D model available for this product.</p>';
     }
-
-    // WhatsApp
-    if (businessData && businessData.businessWhatsapp) {
-        var waNumber = (businessData.businessWhatsapp || '').replace(/[^0-9]/g, '');
-        h += '<div style="text-align:center;margin:12px 0;"><a href="https://wa.me/' + waNumber + '?text=' + encodeURIComponent('Hi! I am interested in ' + item.name) + '" target="_blank" style="display:inline-block;background:#25D366;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;width:100%;text-align:center;">💬 Inquire via WhatsApp</a></div>';
-    }
-
-    h += '<div class="footer-note">Powered by <strong>Vistara</strong></div></div>';
     
-    card.innerHTML = h;
-    document.getElementById('detailModal').classList.add('open'); 
-    document.body.style.overflow = 'hidden';
+    if (businessData && businessData.businessWhatsapp) {
+        var wa = businessData.businessWhatsapp.replace(/[^0-9]/g, '');
+        h += '<a class="contact-btn whatsapp" href="https://wa.me/' + wa + '?text=Hi! I am interested in ' + encodeURIComponent(item.name) + '" target="_blank">💬 Inquire via WhatsApp</a>';
+    }
+    
+    if (businessData && businessData.businessPhone) {
+        h += '<a class="contact-btn call" href="tel:' + businessData.businessPhone + '" style="margin-top:8px;">📞 Call</a>';
+    }
+    
+    h += '</div>';
+    
+    document.getElementById('detailCard').innerHTML = h;
+    document.getElementById('detailModal').classList.add('open');
 };
 
-window.closeDetail = function() { document.getElementById('detailModal').classList.remove('open'); document.body.style.overflow = ''; };
-document.getElementById('detailModal').addEventListener('click', function(e) { if (e.target === this) closeDetail(); });
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeDetail(); });
-function esc(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+window.closeDetail = function() {
+    document.getElementById('detailModal').classList.remove('open');
+};
+
+document.getElementById('detailModal').addEventListener('click', function(e) {
+    if (e.target === this) closeDetail();
+});
 </script>
 </body>
 </html>
