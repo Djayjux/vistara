@@ -125,14 +125,17 @@ function renderCatalog(data) {
         return; 
     }
     
-    businessData = data;
-    
-    // Check if items exists and has length
-    if (!data.items || data.items.length === 0) { 
-        c.innerHTML = buildHeader(data) + '<div class="empty-state"><p>No products yet. Items: ' + JSON.stringify(data.items) + '</p></div>'; 
-        return; 
-    }
-    
+   businessData = data;
+
+// Normalize: handle items nested under different keys or root array
+var items = data.items || data.products || data.data || (Array.isArray(data) ? data : null);
+
+if (!items || items.length === 0) { 
+    c.innerHTML = buildHeader(data) + '<div class="empty-state"><p>No products yet.</p></div>'; 
+    return; 
+}
+
+catalogItems = items;    
     catalogItems = data.items;
     
     // Build catalog
