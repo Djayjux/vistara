@@ -113,27 +113,27 @@ function loadCatalog() {
             document.getElementById('catalogContent').innerHTML = '<div class="empty-state"><p>Error loading.</p><button onclick="location.reload()" style="margin-top:12px;padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:Inter,sans-serif;">🔄 Retry</button></div>'; 
         });
 }
-
 function renderCatalog(data) {
     var c = document.getElementById('catalogContent');
     
-    // Always show the data we got
+    console.log('renderCatalog received:', JSON.stringify(data));
+    console.log('Items array:', data.items);
+    console.log('Items length:', data.items ? data.items.length : 'no items property');
+    
     if (!data) { 
         c.innerHTML = '<div class="empty-state"><h3>Error</h3><p>No data received.</p></div>'; 
         return; 
     }
-    if (data.businessName === 'Not Found') {
-        c.innerHTML = '<div class="empty-state"><h3>Business Not Found</h3></div>'; 
-        return;
-    }
     
     businessData = data;
-    catalogItems = data.items || [];
     
-    if (catalogItems.length === 0) { 
-        c.innerHTML = buildHeader(data) + '<div class="empty-state"><p>No products yet.</p></div>'; 
+    // Check if items exists and has length
+    if (!data.items || data.items.length === 0) { 
+        c.innerHTML = buildHeader(data) + '<div class="empty-state"><p>No products yet. Items: ' + JSON.stringify(data.items) + '</p></div>'; 
         return; 
     }
+    
+    catalogItems = data.items;
     
     // Build catalog
     var cats = ['All'];
@@ -152,7 +152,7 @@ function renderCatalog(data) {
         '<div class="footer-note">Powered by <strong>Vistara</strong></div>';
     
     renderProducts();
-}    
+}
 
 function buildHeader(data) {
     var h = '<div class="biz-header">';
