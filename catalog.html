@@ -101,18 +101,28 @@ if (!bizId) {
 function loadCatalog() {
     var body = new URLSearchParams();
     body.append('data', JSON.stringify({ action: 'publicGetCatalog', payload: { businessId: bizId } }));
-    console.log('Loading catalog for:', bizId);
+    console.log('Sending request for bizId:', bizId);
     fetch(API_URL, { method: 'POST', body: body })
-        .then(function(r) { return r.json(); })
-        .then(function(d) { 
-            console.log('API response:', d);
-            renderCatalog(d); 
+        .then(function(r) { 
+            console.log('HTTP status:', r.status);
+            return r.text();  // <-- get raw text first, not JSON
+        })
+        .then(function(text) { 
+            console.log('Raw response:', text);  // <-- see exactly what came back
+            try {
+                var d = JSON.parse(text);
+                console.log('Parsed keys:', Object.keys(d));
+                renderCatalog(d);
+            } catch(e) {
+                console.error('JSON parse failed:', e);
+                document.getElementById('catalogContent').innerHTML = '<div class="empty-state"><pre style="font-size:10px;text-align:left;overflow:auto">' + text.substring(0, 500) + '</pre></div>';
+            }
         })
         .catch(function(e) { 
             console.error('Fetch error:', e);
-            document.getElementById('catalogContent').innerHTML = '<div class="empty-state"><p>Error loading.</p><button onclick="location.reload()" style="margin-top:12px;padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:Inter,sans-serif;">🔄 Retry</button></div>'; 
+            document.getElementById('catalogContent').innerHTML = '<div class="empty-state"><p>Network error: ' + e.message + '</p></div>';
         });
-}
+}    
 function renderCatalog(data) {
     var c = document.getElementById('catalogContent');
     
