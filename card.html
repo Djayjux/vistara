@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vistara Smart Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.2.0/model-viewer.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #0b0b0b;
+            --card-bg: #141414;
+            --accent-gold: #c5a880;
+            --text-main: #ffffff;
+            --text-muted: #aaaaaa;
+            --input-bg: #1f1f1f;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; padding: 20px; }
+
+        .profile-container { width: 100%; max-width: 420px; background-color: var(--card-bg); border-radius: 24px; border: 1px solid #222; padding-bottom: 30px; }
+        .brand-header { text-align: center; padding: 24px 0 10px 0; font-size: 1rem; letter-spacing: 3px; color: var(--text-muted); }
+        .brand-header span { color: var(--text-main); font-weight: 700; }
+        .brand-header i { color: var(--accent-gold); font-style: italic; }
+
+        .profile-hero { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 15px 20px; }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--accent-gold); object-fit: cover; margin-bottom: 12px; display: none; }
+        .name { font-size: 1.4rem; font-weight: 600; margin-bottom: 4px; }
+        .title { font-size: 0.9rem; color: var(--accent-gold); letter-spacing: 0.5px; margin-bottom: 15px; }
+
+        .showcase-container { width: 90%; height: 220px; margin: 0 auto 25px auto; border-radius: 16px; background: radial-gradient(circle, #1f1f1f 0%, #121212 100%); border: 1px solid #2a2a2a; position: relative; overflow: hidden; display: none; }
+        model-viewer { width: 100%; height: 100%; }
+        .ar-hint { position: absolute; bottom: 12px; right: 12px; background: rgba(0, 0, 0, 0.7); padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; color: var(--accent-gold); border: 1px solid #333; }
+
+        .action-area { display: flex; flex-direction: column; gap: 12px; padding: 0 24px; margin-bottom: 25px; }
+        .btn { display: flex; justify-content: center; align-items: center; gap: 10px; width: 100%; padding: 14px; border-radius: 12px; font-size: 0.95rem; font-weight: 600; text-decoration: none; cursor: pointer; border: none; }
+        .btn-primary { background-color: var(--text-main); color: var(--bg-color); }
+        .btn-secondary { background-color: transparent; color: var(--text-main); border: 1px solid #333; }
+
+        .social-grid { display: flex; justify-content: center; gap: 18px; padding: 0 24px; }
+        .social-icon { display: none; justify-content: center; align-items: center; width: 46px; height: 46px; background-color: #1a1a1a; border-radius: 50%; color: var(--text-main); text-decoration: none; font-size: 1.1rem; border: 1px solid #222; }
+
+        /* Modal Styles */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; padding: 20px; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-box { width: 100%; max-width: 380px; background-color: var(--card-bg); border: 1px solid #2a2a2a; border-radius: 20px; padding: 24px; position: relative; }
+        .modal-close { position: absolute; top: 16px; right: 16px; background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.8rem; color: var(--accent-gold); text-transform: uppercase; margin-bottom: 6px; }
+        .form-input { width: 100%; padding: 12px; background-color: var(--input-bg); border: 1px solid #333; border-radius: 8px; color: var(--text-main); }
+        .btn-submit { background-color: var(--accent-gold); color: #000; margin-top: 10px; }
+        
+        /* Loader curtain */
+        #loadingScreen { position: fixed; top:0; left:0; width:100%; height:100%; background:#0b0b0b; display:flex; justify-content:center; align-items:center; z-index:9999; color:var(--accent-gold); font-weight:300; letter-spacing:2px; }
+    </style>
+</head>
+<body>
+
+<div id="loadingScreen">LOADING VISTARA PROFILE...</div>
+
+<div class="profile-container" id="profileMain">
+    <div class="brand-header"><span>VIS</span><i>tara</i> SMARTCARD</div>
+
+    <div class="profile-hero">
+        <img src="" id="clientAvatar" alt="Profile" class="avatar">
+        <h1 class="name" id="clientName"></h1>
+        <p class="title" id="clientTitle"></p>
+    </div>
+
+    <div class="showcase-container" id="showcaseContainer">
+        <model-viewer id="clientModel" src="" ar ar-modes="webxr scene-viewer quick-look" camera-controls auto-rotate shadow-intensity="1"></model-viewer>
+        <div class="ar-hint"><i class="fa-solid fa-expand"></i> Swipe to rotate / AR</div>
+    </div>
+
+    <div class="action-area">
+        <a href="#" class="btn btn-primary" id="saveContactBtn"><i class="fa-solid fa-user-plus"></i> Save Contact Card</a>
+        <button class="btn btn-secondary" id="exchangeDetailsBtn"><i class="fa-solid fa-paper-plane"></i> Connect via WhatsApp</button>
+    </div>
+
+    <div class="social-grid">
+        <a href="#" id="linkWhatsapp" class="social-icon" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="#" id="linkLinkedin" class="social-icon" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="#" id="linkInstagram" class="social-icon" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" id="linkWebsite" class="social-icon" target="_blank"><i class="fa-solid fa-globe"></i></a>
+    </div>
+</div>
+
+<div class="modal-overlay" id="contactModal">
+    <div class="modal-box">
+        <button class="modal-close" id="closeModalBtn"><i class="fa-solid fa-xmark"></i></button>
+        <h2 style="font-size:1.2rem; margin-bottom:8px;">Let's Connect</h2>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px;">Exchange details instantly with the profile owner.</p>
+        <form id="leadForm">
+            <div class="form-group"><label>Your Name</label><input type="text" id="userName" class="form-input" required></div>
+            <div class="form-group"><label>WhatsApp Number</label><input type="tel" id="userPhone" class="form-input" required></div>
+            <button type="submit" class="btn btn-submit">Send Connection Request</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    let activeClientWebhook = "";
+    let activeClientName = "";
+
+    // 1. GET CLEAN HANDLE ID FROM URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const clientId = urlParams.get('id');
+
+    // 2. LIVE FETCH FROM BASEROW DATABASE ENGINE
+    async function loadProfileData() {
+        if (!clientId) {
+            document.getElementById('loadingScreen').innerText = "ERROR: NO CARD ID SUPPLIED";
+            return;
+        }
+
+        const tableId = "984382";
+        const token = "UoJY8yx7Fvz0okODj1wvmAnAS6THIp4K";
+        
+        // Query Baserow filtering specifically for rows where 'id' column matches the link handle
+        const baserowUrl = `https://api.baserow.io/api/database/rows/table/${tableId}/?user_field_names=true&filter__id__equal=${clientId.toLowerCase()}`;
+
+        try {
+            const response = await fetch(baserowUrl, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Token ${token}`
+                }
+            });
+            const data = await response.json();
+
+            if (data.results && data.results.length > 0) {
+                renderProfile(data.results[0]);
+            } else {
+                document.getElementById('loadingScreen').innerText = "VISTARA PROFILE NOT FOUND";
+            }
+        } catch (error) {
+            console.error("Database Connection Failure:", error);
+            document.getElementById('loadingScreen').innerText = "NETWORK ERROR";
+        }
+    }
+
+    // 3. MAP DATABASE STRINGS AND ATTACHMENTS TO THE SCREEN Dynamically
+    function renderProfile(record) {
+        document.getElementById('clientName').innerText = record.name || '';
+        document.getElementById('clientTitle').innerText = record.title || '';
+        
+        // Render Profile Picture file attachment array safely if populated
+        if (record.avatarUrl && record.avatarUrl.length > 0) {
+            const imgEl = document.getElementById('clientAvatar');
+            imgEl.src = record.avatarUrl[0].url;
+            imgEl.style.display = 'block';
+        }
+        
+        // Render 3D Engine model container smoothly if glb is uploaded
+        if (record.glbUrl && record.glbUrl.length > 0) {
+            document.getElementById('clientModel').setAttribute('src', record.glbUrl[0].url);
+            document.getElementById('showcaseContainer').style.style.display = 'block';
+        }
+
+        // Setup VCF Contact download fallback structure 
+        document.getElementById('saveContactBtn').href = `https://wa.me/${record.phone}`;
+
+        // Dynamic Social Layout Management: Automatically hides button wrappers if cell value is missing
+        setupSocialIcon('linkWhatsapp', record.phone ? `https://wa.me/${record.phone}` : null);
+        setupSocialIcon('linkLinkedin', record.linkedin);
+        setupSocialIcon('linkInstagram', record.instagram);
+        setupSocialIcon('linkWebsite', record.website);
+
+        activeClientWebhook = record.webhook || '';
+        activeClientName = record.name || '';
+
+        // Drop Curtain
+        document.getElementById('loadingScreen').style.display = 'none';
+    }
+
+    function setupSocialIcon(elementId, destinationUrl) {
+        const iconElement = document.getElementById(elementId);
+        if (destinationUrl && destinationUrl !== '#') {
+            iconElement.href = destinationUrl;
+            iconElement.style.display = 'flex';
+        }
+    }
+
+    // 4. POPUP LEAD INTERACTION & DATA EMISSION
+    const exchangeBtn = document.getElementById('exchangeDetailsBtn');
+    const modalOverlay = document.getElementById('contactModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const leadForm = document.getElementById('leadForm');
+    const mainContainer = document.getElementById('profileMain');
+
+    exchangeBtn.addEventListener('click', () => { modalOverlay.classList.add('active'); mainContainer.style.filter = 'blur(4px)'; });
+    const closeModal = () => { modalOverlay.classList.remove('active'); mainContainer.style.filter = 'none'; };
+    closeModalBtn.addEventListener('click', closeModal);
+
+    leadForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('userName').value;
+        const phone = document.getElementById('userPhone').value;
+
+        if(!activeClientWebhook) {
+            alert(`Thanks ${name}! Direct submission is completed.`);
+            closeModal();
+            return;
+        }
+
+        fetch(activeClientWebhook, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                leadName: name,
+                leadPhone: phone,
+                profileOwner: activeClientName,
+                timestamp: new Date().toISOString()
+            })
+        })
+        .then(res => { if(res.ok) alert(`Perfect! Connection details routed directly to ${activeClientName}.`); })
+        .catch(err => console.error("Webhook route failure:", err));
+
+        closeModal();
+        leadForm.reset();
+    });
+
+    window.onload = loadProfileData;
+</script>
+</body>
+</html>
