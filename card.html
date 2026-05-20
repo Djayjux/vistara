@@ -119,8 +119,8 @@
         const tableId = "984382";
         const token = "UoJY8yx7Fvz0okODj1wvmAnAS6THIp4K";
         
-        // Query Baserow filtering specifically for rows where 'id' column matches the link handle
-        const baserowUrl = `https://api.baserow.io/api/database/rows/table/${tableId}/?user_field_names=true&filter__id__equal=${clientId.toLowerCase()}`;
+        // We pull the rows cleanly without complex URL filtering strings
+        const baserowUrl = `https://api.baserow.io/api/database/rows/table/${tableId}/?user_field_names=true`;
 
         try {
             const response = await fetch(baserowUrl, {
@@ -132,16 +132,27 @@
             const data = await response.json();
 
             if (data.results && data.results.length > 0) {
-                renderProfile(data.results[0]);
+                // Search through the rows to find a matching ID safely
+                const targetSlug = clientId.toLowerCase().trim();
+                const matchedRecord = data.results.find(row => {
+                    // This handles case-insensitivity or accidental spaces seamlessly
+                    const rowId = row.id || row.Id || '';
+                    return rowId.toString().toLowerCase().trim() === targetSlug;
+                });
+
+                if (matchedRecord) {
+                    renderProfile(matchedRecord);
+                } else {
+                    document.getElementById('loadingScreen').innerText = `PROFILE "${clientId}" NOT FOUND IN DATABASE`;
+                }
             } else {
-                document.getElementById('loadingScreen').innerText = "VISTARA PROFILE NOT FOUND";
+                document.getElementById('loadingScreen').innerText = "DATABASE IS EMPTY";
             }
         } catch (error) {
             console.error("Database Connection Failure:", error);
             document.getElementById('loadingScreen').innerText = "NETWORK ERROR";
         }
     }
-
     // 3. MAP DATABASE STRINGS AND ATTACHMENTS TO THE SCREEN Dynamically
     function renderProfile(record) {
         document.getElementById('clientName').innerText = record.name || '';
